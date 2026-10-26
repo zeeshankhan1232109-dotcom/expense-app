@@ -1,0 +1,17 @@
+{
+  "name": "Expense Tracker",
+  "short_name": "Expenses",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090A10",
+  "theme_color": "#8B5CF6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%238B5CF6'/%3E%3Cpath d='M140 180h232c18 0 32 14 32 32v140c0 18-14 32-32 32H140c-18 0-32-14-32-32V212c0-18 14-32 32-32z' fill='%23ffffff' fill-opacity='0.25'/%3E%3Cpath d='M140 140h200c18 0 32 14 32 32v20H108v-20c0-18 14-32 32-32z' fill='%23ffffff' fill-opacity='0.4'/%3E%3Crect x='108' y='200' width='296' height='172' rx='28' fill='%23ffffff'/%3E%3Ccircle cx='340' cy='286' r='24' fill='%238B5CF6'/%3E%3Cpath d='M200 286h70' stroke='%238B5CF6' stroke-width='16' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
