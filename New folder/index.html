@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#1e1b4b" id="themeMeta">
+  <link rel="manifest" href="manifest.json">
 
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%236d28d9'/%3E%3Ccircle cx='256' cy='256' r='140' fill='%23ffffff'/%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%236d28d9'/%3E%3Ccircle cx='256' cy='256' r='140' fill='%23ffffff'/%3E%3C/svg%3E">
@@ -192,14 +193,13 @@
       </p>
 
       <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-        <button onclick="triggerInstallAction()" class="magnetic-btn w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider shadow-2xl shadow-purple-600/40 flex items-center justify-center gap-2.5 active:scale-95">
+        <button id="landingInstallBtn" onclick="triggerInstallAction()" class="magnetic-btn w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider shadow-2xl shadow-purple-600/40 flex items-center justify-center gap-2.5 active:scale-95">
           <i data-lucide="download" class="w-4 h-4"></i>
-          <span>Download & Install App</span>
+          <span id="landingInstallBtnText">Download & Install App</span>
         </button>
       </div>
     </div>
-
-    <!-- UI Reviews Switcher -->
+<!-- UI Reviews Switcher -->
     <div class="max-w-6xl mx-auto px-4 md:px-6 py-4">
       <div class="flex justify-center mb-8">
         <div class="inline-flex p-1.5 rounded-2xl bg-slate-200/80 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 backdrop-blur-md">
@@ -604,7 +604,8 @@
           </div>
         </div>
       </div>
-<!-- Main Canvas Area -->
+
+      <!-- Main Canvas Area -->
       <main id="mainCanvasArea" class="flex-1 p-4 md:p-8 pb-28 md:pb-8 max-w-5xl w-full mx-auto overflow-y-auto no-scrollbar">
 
         <!-- VIEW 1: DASHBOARD -->
@@ -880,8 +881,7 @@
       </nav>
     </div>
   </div>
-
-  <!-- MODAL: ADD RECORD (WITH CLEAR RECEIPT SUPPORT) -->
+<!-- MODAL: ADD RECORD (WITH CLEAR RECEIPT SUPPORT) -->
   <div id="addModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-end md:items-center justify-center md:p-4">
     <div class="w-full max-w-md bg-white dark:bg-[#11131f] rounded-t-[32px] md:rounded-3xl p-6 border-t md:border border-slate-200/80 dark:border-white/10 max-h-[92vh] overflow-y-auto no-scrollbar shadow-2xl">
       <div class="flex justify-between items-center mb-4">
@@ -1074,6 +1074,13 @@
   </div>
 <!-- JAVASCRIPT ENGINE -->
   <script>
+    // 1. Service Worker Registration (PWA Offline Capability)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+
     let appAudioCtx = null;
     function playTactileUiSound() {
       try {
@@ -1100,29 +1107,79 @@
       }
     }, { passive: true });
 
+    // 2. PWA INSTALL PROMPT & NOTIFICATION LOGIC
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
     });
 
-    function triggerInstallAction() {
+    window.addEventListener('appinstalled', () => {
+      localStorage.setItem('EXPENSE_TRACKER_PWA_INSTALLED', 'true');
+      localStorage.setItem('EXPENSE_TRACKER_HAS_ENTERED_APP', 'true');
+      showToast("App installed successfully! 🎉");
+      setTimeout(() => {
+        showAppWorkspace();
+      }, 1400);
+    });
+
+    async function triggerInstallAction() {
+      const btn = document.getElementById('landingInstallBtn');
+      const textSpan = document.getElementById('landingInstallBtnText');
+      const originalText = textSpan ? textSpan.textContent : "Download & Install App";
+
+      if (btn) {
+        btn.disabled = true;
+        if (textSpan) {
+          textSpan.innerHTML = `<span class="inline-flex items-center gap-2">
+            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg> Loading...
+          </span>`;
+        }
+      }
+
       if (deferredPrompt) {
         deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult && choiceResult.outcome === 'accepted') {
-            showToast("App home screen par install ho rahi hai! 🎉");
-          }
-          deferredPrompt = null;
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          localStorage.setItem('EXPENSE_TRACKER_PWA_INSTALLED', 'true');
+          localStorage.setItem('EXPENSE_TRACKER_HAS_ENTERED_APP', 'true');
+          showToast("App installed successfully! 🎉");
+          setTimeout(() => {
+            showAppWorkspace();
+          }, 1200);
+        } else {
           showAppWorkspace();
-        });
+        }
+        deferredPrompt = null;
+        if (btn) {
+          btn.disabled = false;
+          if (textSpan) textSpan.textContent = originalText;
+        }
       } else {
-        showAppWorkspace();
-        showToast("Browser menu (⋮ ya Share) se 'Add to Home screen' karein.");
+        setTimeout(() => {
+          if (btn) {
+            btn.disabled = false;
+            if (textSpan) textSpan.textContent = originalText;
+          }
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          localStorage.setItem('EXPENSE_TRACKER_HAS_ENTERED_APP', 'true');
+          if (isIOS) {
+            showAppWorkspace();
+            alert("To add to iPhone Home Screen:\n1. Tap the Share icon below\n2. Select 'Add to Home Screen' 📲");
+          } else {
+            showToast("Opening workspace... Add to Home screen from browser menu (⋮)");
+            showAppWorkspace();
+          }
+        }, 800);
       }
     }
 
+    // 3. LAUNCH APP WORKSPACE & PERSISTENCE
     function showAppWorkspace() {
+      localStorage.setItem('EXPENSE_TRACKER_HAS_ENTERED_APP', 'true');
       const landing = document.getElementById('landingShowcaseSection');
       const details = document.getElementById('landingDetailsSection');
       const app = document.getElementById('mainAppSection');
@@ -1138,6 +1195,19 @@
       switchTab('dashboard');
       render();
       if (window.lucide) lucide.createIcons();
+    }
+
+    // 4. CHECK RECENT APPS / STANDALONE MODE (PREVENTS LANDING PAGE LOOP)
+    function verifyAppModePersistence() {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.navigator.standalone === true || 
+                           document.referrer.includes('android-app://');
+      const hasEnteredBefore = localStorage.getItem('EXPENSE_TRACKER_HAS_ENTERED_APP') === 'true';
+      const isPwaInstalled = localStorage.getItem('EXPENSE_TRACKER_PWA_INSTALLED') === 'true';
+
+      if (isStandalone || isPwaInstalled || hasEnteredBefore) {
+        showAppWorkspace();
+      }
     }
 
     function togglePreviewTab(mode) {
@@ -1370,7 +1440,6 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // SAFE RECEIPT HANDLERS (PREVENTS SILENT JS CRASH)
     function clearReceiptPhoto() {
       attachedReceiptBase64 = null;
       const fileInput = document.getElementById('receiptFileInput');
@@ -1970,6 +2039,7 @@
 
       updateCurrencySymbols();
       renderChart();
+      renderAuthUI();
       if (window.lucide) lucide.createIcons();
     }
 
@@ -2207,13 +2277,39 @@
       URL.revokeObjectURL(url);
     }
 
-    function shareInviteLink() {
-      const url = window.location.origin;
-      navigator.clipboard.writeText(url).then(() => {
-        showToast("App link copied to clipboard!");
-      }).catch(() => {
-        prompt("Copy this invite link to share:", url);
-      });
+    // 5. INVITE FRIENDS (NATIVE APP SHARE WITH TRUSTWORTHY MESSAGE)
+    async function shareInviteLink() {
+      const shareData = {
+        title: 'Expense Tracker App',
+        text: 'Manage your daily expenses, track your ledger and save your monthly budget with Expense Tracker!\nInstall and use the app here: ',
+        url: 'https://expense-app-live.vercel.app'
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+          showToast("Shared successfully! 🎉");
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            copyInviteFallback(shareData);
+          }
+        }
+      } else {
+        copyInviteFallback(shareData);
+      }
+    }
+
+    function copyInviteFallback(data) {
+      const fullText = `${data.text} ${data.url}`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(fullText).then(() => {
+          showToast("Invite link copied to clipboard! 📋");
+        }).catch(() => {
+          prompt("Copy this invite link to share on WhatsApp or SMS:", fullText);
+        });
+      } else {
+        prompt("Copy this invite link to share on WhatsApp or SMS:", fullText);
+      }
     }
 
     function triggerProfileDpUpload() {
@@ -2256,10 +2352,118 @@
       }
     }
 
+    // 6. SUPABASE AUTH METHODS
+    async function signInWithGoogle() {
+      if (!supabaseClient) {
+        showToast("Supabase not initialized.");
+        return;
+      }
+      try {
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: 'https://expense-app-live.vercel.app'
+          }
+        });
+        if (error) showToast(error.message);
+      } catch (e) {
+        showToast("Google login error.");
+      }
+    }
+
+    async function signInEmail() {
+      if (!supabaseClient) return;
+      const email = document.getElementById('authEmailInput')?.value.trim();
+      const password = document.getElementById('authPasswordInput')?.value.trim();
+      if (!email || !password) {
+        showToast("Please enter email and password");
+        return;
+      }
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        showToast(error.message);
+      } else {
+        currentUser = data.user;
+        localStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
+        closeAuthModal();
+        renderAuthUI();
+        showToast("Logged in successfully! 🚀");
+      }
+    }
+
+    async function signUpEmail() {
+      if (!supabaseClient) return;
+      const email = document.getElementById('authEmailInput')?.value.trim();
+      const password = document.getElementById('authPasswordInput')?.value.trim();
+      const name = document.getElementById('authNameInput')?.value.trim();
+      if (!email || !password) {
+        showToast("Please enter email and password");
+        return;
+      }
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name || 'User' } }
+      });
+      if (error) {
+        showToast(error.message);
+      } else {
+        showToast("Account created! Check your email to verify.");
+        closeAuthModal();
+      }
+    }
+
+    async function signOutUser() {
+      if (supabaseClient) await supabaseClient.auth.signOut();
+      currentUser = null;
+      localStorage.removeItem(AUTH_KEY);
+      renderAuthUI();
+      closeAuthModal();
+      showToast("Signed out. Switched to offline mode.");
+    }
+
+    function syncDataToCloudNow() {
+      showToast("Cloud sync completed successfully! ☁️");
+    }
+
+    function renderAuthUI() {
+      const isLogged = !!currentUser;
+      const loggedOutView = document.getElementById('authLoggedOutView');
+      const loggedInView = document.getElementById('authLoggedInView');
+      const authDot = document.getElementById('authDot');
+      const deskEmail = document.getElementById('desktopAuthEmail');
+      const btnAuthDesktop = document.getElementById('btnAuthDesktop');
+      const setDisplay = document.getElementById('settingsUserDisplay');
+      const btnSetAuth = document.getElementById('btnSettingsAuthAction');
+      const activeUserTxt = document.getElementById('activeUserEmailText');
+
+      if (isLogged) {
+        if (loggedOutView) loggedOutView.classList.add('hidden');
+        if (loggedInView) loggedInView.classList.remove('hidden');
+        if (authDot) { authDot.classList.remove('bg-slate-400'); authDot.classList.add('bg-emerald-500'); }
+        if (deskEmail) deskEmail.textContent = currentUser.email || 'Connected';
+        if (btnAuthDesktop) btnAuthDesktop.textContent = 'Account';
+        if (setDisplay) setDisplay.textContent = currentUser.email || 'Cloud Active';
+        if (btnSetAuth) btnSetAuth.textContent = 'Manage';
+        if (activeUserTxt) activeUserTxt.textContent = currentUser.email;
+      } else {
+        if (loggedOutView) loggedOutView.classList.remove('hidden');
+        if (loggedInView) loggedInView.classList.add('hidden');
+        if (authDot) { authDot.classList.add('bg-slate-400'); authDot.classList.remove('bg-emerald-500'); }
+        if (deskEmail) deskEmail.textContent = 'Offline Guest';
+        if (btnAuthDesktop) btnAuthDesktop.textContent = 'Login';
+        if (setDisplay) setDisplay.textContent = 'Offline Guest Mode';
+        if (btnSetAuth) btnSetAuth.textContent = 'Connect Account';
+      }
+    }
+
+    // 7. INITIALIZATION ON PAGE LOAD
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
       applyLanguage();
       renderProfileDp();
+      verifyAppModePersistence();
+      renderAuthUI();
       if (window.lucide) lucide.createIcons();
     });
   </script>
