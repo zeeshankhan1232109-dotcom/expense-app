@@ -18,27 +18,28 @@
   <!-- Tailwind CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            mono: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'sans-serif']
-          },
-          colors: {
-            brand: {
-              50: '#F5F3FF',
-              100: '#EDE9FE',
-              500: '#8B5CF6',
-              600: '#7C3AED',
-              700: '#6D28D9'
-            }
+ <script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          mono: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'sans-serif']
+        },
+        colors: {
+          brand: {
+            50: '#F5F3FF',
+            100: '#EDE9FE',
+            500: '#8B5CF6',
+            600: '#7C3AED',
+            700: '#6D28D9'
           }
         }
       }
     }
+  }
+</script>
   </script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,21 +52,25 @@
   <!-- OCR Library for Bill Scanning -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-  <style>
-    :root {
-      --sat: env(safe-area-inset-top, 0px);
-      --sab: env(safe-area-inset-bottom, 0px);
-    }
+ <style>
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
 
-    body {
-      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
+body {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mcb-curved-banner {
+  padding-top: max(1rem, env(safe-area-inset-top, 0px)) !important;
+}
 
     .font-mono {
       font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif !important;
@@ -166,6 +171,15 @@
   }
     .urdu-font { font-family: 'Noto Nastaliq Urdu', serif !important; }
   </style>
+  <!-- Light Mode Theme Color -->
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F8FC">
+
+<!-- Dark Mode Theme Color -->
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090A10">
+
+<!-- iPhone Strict Native Status Bar -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   </head>
 <body class="bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 min-h-screen selection:bg-brand-500 selection:text-white antialiased">
 
@@ -174,7 +188,7 @@
     <header class="sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-[#090A10]/85 border-b border-slate-200 dark:border-white/10 px-6 py-4">
       <div class="max-w-6xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <img src="app-icon.png" alt="App Icon" class="w-10 h-10 rounded-2xl shadow-lg shadow-purple-600/30 object-cover">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-black shadow-lg shadow-purple-600/30">ET</div>
           <div>
             <h1 class="text-sm font-black tracking-wider uppercase text-slate-900 dark:text-white">EXPENSE TRACKER</h1>
             <p class="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-widest">NATIVE V2.9</p>
@@ -866,47 +880,48 @@
               </div>
 
               <div>
-                <h3 id="lblSettingsTitle" class="text-sm md:text-base font-extrabold text-slate-900 dark:text-white">Settings</h3>
+
                 <p class="text-[10px] text-slate-400 font-semibold flex items-center gap-1.5 mt-0.5">
                   <span>Tap circle to change photo</span>
                   <button id="btnRemoveDp" onclick="removeProfileDp(event)" class="hidden text-[10px] text-rose-500 font-bold hover:underline">Remove DP</button>
                 </p>
               </div>
             </div>
+<div class="space-y-3">
+  <!-- EXPLORE DEMO EXPERIENCE -->
+  <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-between gap-2">
+    <div class="flex-1">
+      <span class="text-xs font-extrabold text-slate-900 dark:text-white block">Explore Demo Experience</span>
+      <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5 leading-tight">Load sample records & learn smart tracking</span>
+    </div>
+    <button onclick="openDemoModal()" class="shrink-0 px-4 py-2 rounded-xl bg-purple-600 text-white font-extrabold text-xs">
+      Demo
+    </button>
+  </div>
 
-            <!-- DEMO MODE ROW -->
-            <div class="p-3.5 rounded-2xl bg-purple-50/70 dark:bg-purple-500/10 border border-purple-200/80 dark:border-purple-500/20 flex items-center justify-between">
-              <div>
-                <span class="text-xs font-extrabold text-purple-900 dark:text-purple-200 block">Explore Demo Experience</span>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400">Load sample records & learn smart tracking</span>
-              </div>
-              <button onclick="openDemoModal()" class="px-3.5 py-1.5 rounded-xl bg-purple-600 text-white font-extrabold text-xs shadow-md shadow-purple-600/30 hover:bg-purple-700 transition flex items-center gap-1.5">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                <span>Open Demo</span>
-              </button>
-            </div>
+  <!-- CLOUD BACKUP ACCOUNT -->
+  <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-between gap-2">
+    <div class="flex-1">
+      <span class="text-xs font-extrabold text-slate-900 dark:text-white block">Cloud Backup Account</span>
+      <span id="settingsUserDisplay" class="text-[10px] text-slate-500 dark:text-slate-400 font-mono block mt-0.5 leading-tight">Offline Guest Mode</span>
+    </div>
+    <button onclick="openAuthModal()" id="btnSettingsAuthAction" class="shrink-0 px-4 py-2 rounded-xl bg-purple-600 text-white font-extrabold text-xs">
+      Connect
+    </button>
+  </div>
 
-            <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center justify-between">
-              <div>
-                <span class="text-xs font-extrabold text-slate-900 dark:text-white block">Cloud Backup Account</span>
-                <span id="settingsUserDisplay" class="text-[11px] text-slate-400 font-mono">Offline Guest Mode</span>
-              </div>
-              <button onclick="openAuthModal()" id="btnSettingsAuthAction" class="px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 font-bold text-xs border border-purple-200 dark:border-purple-500/20">
-                Connect Account
-              </button>
-            </div>
-
-            <div class="p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-500/10 dark:to-indigo-500/10 border border-purple-200/70 dark:border-purple-500/20 flex items-center justify-between">
-              <div>
-                <span class="text-xs font-extrabold text-purple-900 dark:text-purple-200 block">Invite Friends & Family</span>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400">Share download link via WhatsApp or copy</span>
-              </div>
-              <button onclick="shareInviteLink()" class="px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-md shadow-purple-600/20 active:scale-95 transition flex items-center gap-1.5">
-                <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-                <span>Invite</span>
-              </button>
-            </div>
-
+  <!-- INVITE FRIENDS & FAMILY -->
+  <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-between gap-2">
+    <div class="flex-1">
+      <span class="text-xs font-extrabold text-slate-900 dark:text-white block">Invite Friends & Family</span>
+      <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5 leading-tight">Share download link via WhatsApp</span>
+    </div>
+    <button onclick="shareApp()" class="shrink-0 px-4 py-2 rounded-xl bg-purple-600 text-white font-extrabold text-xs flex items-center gap-1.5">
+      <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+      Invite
+    </button>
+  </div>
+</div>
             <div>
               <label id="lblCurrencySelector" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Select Currency</label>
               <select id="settingCurrencySelect" onchange="changeCurrency(this.value)" class="w-full bg-slate-50 dark:bg-[#11131f] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-purple-500">
@@ -2733,13 +2748,23 @@ Do NOT use markdown or backticks. Return raw JSON only.`;
       if (typeof renderChart === 'function') renderChart();
     }
 
-   function toggleTheme() {
+  function toggleTheme() {
   document.documentElement.classList.add('no-transitions');
-  const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+  const isDark = document.documentElement.classList.toggle('dark');
+  const newTheme = isDark ? 'dark' : 'light';
+  
   settings.theme = newTheme;
   localStorage.setItem('theme', newTheme);
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  
+  // Dynamic status bar meta color update for light and dark modes
+  const meta = document.getElementById('themeMeta');
+  if (meta) {
+    meta.setAttribute('content', isDark ? '#1e1b4b' : '#ffffff');
+  }
+
   applyTheme(newTheme);
+  
   requestAnimationFrame(() => {
     document.documentElement.classList.remove('no-transitions');
   });
