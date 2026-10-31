@@ -7,14 +7,16 @@
   
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <!-- iPhone Dynamic Island / Notch Transparent Status Bar Coverage -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#1e1b4b" id="themeMeta">
   <link rel="manifest" href="manifest.json">
 
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%236d28d9'/%3E%3Ccircle cx='256' cy='256' r='140' fill='%23ffffff'/%3E%3C/svg%3E">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%236d28d9'/%3E%3Ccircle cx='256' cy='256' r='140' fill='%23ffffff'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="app-icon.png">
+  <link rel="apple-touch-icon" href="app-icon.png">
 
   <!-- Tailwind CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -44,16 +46,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@500;700&display=swap" rel="stylesheet">
   
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- OCR Library for Bill Scanning -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
+    :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+    }
+
     body {
       font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       transition: background-color 0.3s ease, color 0.3s ease;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     .font-mono {
@@ -62,14 +73,15 @@
       letter-spacing: -0.02em;
     }
 
-    /* TOP CURVED HEADER: ROYAL PURPLE-NAVY */
+    /* TOP CURVED HEADER */
     .mcb-curved-banner {
       background: linear-gradient(145deg, #1e1b4b 0%, #2e1065 42%, #0f172a 100%) !important;
       border-bottom: 1px solid rgba(168, 85, 247, 0.25);
       box-shadow: 0 16px 36px -10px rgba(46, 16, 101, 0.55);
+      padding-top: calc(1rem + env(safe-area-inset-top, 0px)) !important;
     }
 
-    /* TOP GLASS BALANCE & FLIP CARD: SHARP & CLEAR (ZERO TEXT BLUR) */
+    /* GLASS CARD */
     .mcb-glass-card {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
       background-color: rgba(30, 27, 75, 0.45) !important;
@@ -105,7 +117,7 @@
       box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.08) !important;
     }
 
-    /* 3D FLIP MECHANICS (CRYSTAL CLEAR HD - ZERO BLUR FIX) */
+    /* 3D FLIP MECHANICS */
     .flip-card-container {
       perspective: 1200px;
       -webkit-perspective: 1200px;
@@ -114,7 +126,7 @@
     .flip-card-inner {
       position: relative;
       width: 100%;
-      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       transform-style: preserve-3d;
       -webkit-transform-style: preserve-3d;
     }
@@ -127,8 +139,6 @@
       width: 100%;
       -webkit-backface-visibility: hidden !important;
       backface-visibility: hidden !important;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       transform: translate3d(0, 0, 1px);
       -webkit-transform: translate3d(0, 0, 1px);
     }
@@ -151,19 +161,23 @@
     .magnetic-btn { transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .no-transitions *, .no-transitions *::before, .no-transitions *::after {
+    transition: none !important;
+  }
     .urdu-font { font-family: 'Noto Nastaliq Urdu', serif !important; }
   </style>
-</head>
+  </head>
 <body class="bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 min-h-screen selection:bg-brand-500 selection:text-white antialiased">
-<!-- ==================== 1. PRODUCT SHOWCASE VIEW (LANDING PAGE) ==================== -->
+
+  <!-- ==================== 1. PRODUCT SHOWCASE VIEW (LANDING PAGE) ==================== -->
   <div id="landingShowcaseSection" class="min-h-screen pb-20 bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 transition-colors duration-300">
     <header class="sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-[#090A10]/85 border-b border-slate-200 dark:border-white/10 px-6 py-4">
       <div class="max-w-6xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-purple-600/30">ET</div>
+          <img src="app-icon.png" alt="App Icon" class="w-10 h-10 rounded-2xl shadow-lg shadow-purple-600/30 object-cover">
           <div>
             <h1 class="text-sm font-black tracking-wider uppercase text-slate-900 dark:text-white">EXPENSE TRACKER</h1>
-            <p class="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-widest">NATIVE V2.8</p>
+            <p class="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-widest">NATIVE V2.9</p>
           </div>
         </div>
         <div class="flex items-center gap-3">
@@ -178,10 +192,10 @@
       </div>
     </header>
 
-    <div class="max-w-5xl mx-auto px-6 pt-14 pb-8 text-center">
+    <div class="max-w-5xl mx-auto px-6 pt-12 pb-6 text-center">
       <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30 text-purple-700 dark:text-purple-300 text-xs font-extrabold mb-5 shadow-xs">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span>Cross-Platform Ready • Mobile & Desktop</span>
+        <span>Platform Ready • iOS & Android Native</span>
       </div>
 
       <h2 class="text-3xl md:text-5xl font-black tracking-tight leading-tight max-w-3xl mx-auto text-slate-900 dark:text-white">
@@ -189,7 +203,7 @@
       </h2>
 
       <p class="mt-4 text-xs md:text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto font-medium leading-relaxed">
-        Personal expenses aur ledgers ko sukoon se track karein. Live UI review neeche check karein aur aik click par install karein.
+        Personal expenses aur ledgers ko sukoon se track karein. Live interactive mobile previews neeche dekhein aur aik click par install karein.
       </p>
 
       <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -199,243 +213,257 @@
         </button>
       </div>
     </div>
-<!-- UI Reviews Switcher -->
-    <div class="max-w-6xl mx-auto px-4 md:px-6 py-4">
-      <div class="flex justify-center mb-8">
-        <div class="inline-flex p-1.5 rounded-2xl bg-slate-200/80 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 backdrop-blur-md">
-          <button onclick="togglePreviewTab('desktop')" id="tabDesktop" class="px-6 py-2 rounded-xl font-black text-xs transition bg-purple-600 text-white shadow-md flex items-center gap-2">
-            <i data-lucide="monitor" class="w-4 h-4"></i>
-            <span>Desktop Review</span>
-          </button>
-          <button onclick="togglePreviewTab('mobile')" id="tabMobile" class="px-6 py-2 rounded-xl font-bold text-xs transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-2">
-            <i data-lucide="smartphone" class="w-4 h-4"></i>
-            <span>Mobile Review</span>
-          </button>
-        </div>
-      </div>
 
-      <!-- Desktop View Preview -->
-      <div id="desktopPreviewCard" class="tilt-viewport">
-        <div class="tilt-card rounded-3xl app-card shadow-2xl overflow-hidden max-w-5xl mx-auto text-left">
-          <div class="px-4 py-3 bg-slate-100 dark:bg-[#161824] border-b border-slate-200 dark:border-white/10 flex items-center gap-3">
-            <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
-            </div>
-            <div class="flex-1 max-w-sm mx-auto bg-white/70 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-1 flex items-center gap-2 text-xs font-mono text-slate-700 dark:text-slate-300">
-              <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-500"></i>
-              <span>expensetracker.app/overview</span>
-            </div>
+    <!-- REALISTIC DUAL MOBILE SHOWCASE SECTION -->
+    <div class="max-w-5xl mx-auto px-4 py-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-items-center">
+
+        <!-- PHONE FRAME 1: Dashboard, Curved Banner & Live 3D Flip Card -->
+        <div class="w-full max-w-[320px] rounded-[44px] bg-slate-900 p-3 shadow-[0_25px_60px_-15px_rgba(109,40,217,0.4)] border-4 border-slate-700/60 relative">
+          <!-- Dynamic Island Notch -->
+          <div class="w-24 h-4 bg-black rounded-full mx-auto mb-2 flex items-center justify-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-800"></span>
+            <span class="w-2 h-2 rounded-full bg-purple-900/60"></span>
           </div>
-          <div class="p-6 md:p-8 bg-slate-50/50 dark:bg-[#0b0c13] flex flex-col md:flex-row gap-6">
-            <div class="hidden md:flex flex-col justify-between w-64 p-5 rounded-2xl border border-slate-200 dark:border-white/10 shrink-0 bg-white dark:bg-[#12141F]">
-              <div class="space-y-4">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-9 h-9 rounded-xl bg-purple-600 text-white font-extrabold flex items-center justify-center text-sm shadow-md">ET</div>
-                  <div>
-                    <h3 class="text-xs font-extrabold uppercase text-slate-900 dark:text-white">EXPENSE TRACKER</h3>
-                    <p class="text-[9px] text-slate-400 font-semibold">Native iOS & Android</p>
-                  </div>
-                </div>
-                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-between text-xs">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-                    <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Offline Guest</span>
-                  </div>
-                  <span class="text-[10px] font-bold text-purple-600 dark:text-purple-400">Login</span>
-                </div>
-                <div class="space-y-1">
-                  <div class="px-3 py-2 rounded-xl bg-purple-500/15 text-purple-700 dark:text-purple-300 font-extrabold text-xs flex items-center gap-2 border border-purple-500/30">
-                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
-                    <span>Home Dashboard</span>
-                  </div>
-                  <div class="px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold text-xs flex items-center gap-2">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-                    <span>Monthly Calendar</span>
-                  </div>
-                  <div class="px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold text-xs flex items-center gap-2">
-                    <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
-                    <span>Ledger Records</span>
-                  </div>
-                </div>
+
+          <div class="rounded-[36px] overflow-hidden bg-[#08090d] text-white border border-white/10 shadow-inner flex flex-col">
+            <!-- Simulated Curved Top Banner -->
+            <div class="mcb-curved-banner rounded-b-[28px] p-4 text-left">
+              <div class="flex items-center justify-between mb-3 text-[11px]">
+                <span class="px-2 py-0.5 rounded-lg bg-white/10 font-bold text-purple-200">Personal</span>
+                <span class="text-[9px] font-black uppercase tracking-wider text-purple-300">Live Preview</span>
               </div>
-              <div class="pt-4 border-t border-slate-200 dark:border-white/10 text-[10px] text-slate-400 text-center font-bold">
-                Expense Tracker • Production v2.8<br>Native iOS & Android
+
+              <!-- Interactive Flip Card Inside Phone Frame -->
+              <div class="flip-card-container">
+                <div id="landingShowcaseFlipCard" class="flip-card-inner">
+                  
+                  <!-- Front Side: Balance Card -->
+                  <div onclick="document.getElementById('landingShowcaseFlipCard').classList.toggle('flipped')" class="flip-card-front mcb-glass-card rounded-2xl p-3.5 cursor-pointer select-none">
+                    <div class="flex items-center justify-between text-[10px]">
+                      <span class="font-bold text-purple-200">Safe Daily Limit</span>
+                      <span class="px-2 py-0.5 rounded-full bg-white/20 text-[8px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                        <span>Tap Flip</span>
+                        <i data-lucide="repeat" class="w-2 h-2"></i>
+                      </span>
+                    </div>
+                    <div class="mt-2 mb-1">
+                      <span class="text-[8px] text-purple-300 font-bold tracking-widest block">REMAINING BALANCE</span>
+                      <div class="text-xl font-black font-mono text-white mt-0.5">Rs. 78,500</div>
+                    </div>
+                    <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[9px] text-purple-200 font-bold">
+                      <span>22 Days Remaining</span>
+                      <span class="text-emerald-400">Under Budget 🌿</span>
+                    </div>
+                  </div>
+
+                  <!-- Back Side: Live Currency Converter -->
+                  <div onclick="document.getElementById('landingShowcaseFlipCard').classList.toggle('flipped')" class="flip-card-back mcb-glass-card rounded-2xl p-3 text-left cursor-pointer flex flex-col justify-between">
+                    <div class="flex items-center justify-between pb-1 border-b border-white/10 text-[9px] font-black text-purple-200">
+                      <span>Global Valuation</span>
+                      <span class="text-[8px] text-purple-300">↩ Flip Back</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5 my-1 text-center font-mono text-[10px]">
+                      <div class="p-1 rounded-xl bg-white/10">
+                        <span class="text-[7.5px] text-purple-300 block font-sans">USD</span>
+                        <span class="font-bold text-emerald-400">$282.60</span>
+                      </div>
+                      <div class="p-1 rounded-xl bg-white/10">
+                        <span class="text-[7.5px] text-purple-300 block font-sans">AED</span>
+                        <span class="font-bold text-cyan-300">1,020.50</span>
+                      </div>
+                      <div class="p-1 rounded-xl bg-white/10">
+                        <span class="text-[7.5px] text-purple-300 block font-sans">SAR</span>
+                        <span class="font-bold text-amber-300">1,059.75</span>
+                      </div>
+                      <div class="p-1 rounded-xl bg-white/10">
+                        <span class="text-[7.5px] text-purple-300 block font-sans">EUR</span>
+                        <span class="font-bold text-indigo-300">€259.05</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
 
-            <div class="flex-1 space-y-5">
-              <div class="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-white/10">
-                <div>
-                  <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Financial Overview</h3>
-                  <p class="text-[11px] text-slate-400">Track and manage your multi-book expenses with ease</p>
-                </div>
+            <!-- Mini List Inside Phone 1 -->
+            <div class="p-3.5 space-y-2 text-left">
+              <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block px-1">Today's Quick Ledger</span>
+              <div class="p-2 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between text-[11px]">
                 <div class="flex items-center gap-2">
-                  <span class="px-3 py-1.5 rounded-xl bg-slate-200/60 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold">Cloud Sync: Guest</span>
-                  <span class="px-3 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-bold shadow-md">+ New Record</span>
+                  <span class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xs">💰</span>
+                  <span class="font-bold text-white">Freelance Payment</span>
                 </div>
+                <span class="font-mono font-extrabold text-emerald-400 text-xs">+Rs. 45,000</span>
               </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="md:col-span-2 p-5 rounded-2xl bg-white dark:bg-[#12141F] border border-slate-200 dark:border-white/10 flex flex-col justify-between shadow-xs">
-                  <div class="flex justify-between items-center text-xs">
-                    <span class="font-bold text-slate-400 uppercase text-[10px]">TOTAL MONTHLY SPENDING</span>
-                    <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Safe Budget 🌿</span>
-                  </div>
-                  <div class="my-2 flex items-baseline gap-1">
-                    <span class="text-sm font-bold text-purple-600 dark:text-purple-400 font-mono">Rs.</span>
-                    <span class="text-3xl font-extrabold font-mono text-slate-900 dark:text-white tracking-tight">15,170</span>
-                  </div>
-                  <div class="pt-3 border-t border-slate-100 dark:border-white/10 grid grid-cols-2 text-xs">
-                    <div>
-                      <span class="text-[10px] text-slate-400 font-bold uppercase block">TOTAL INCOME</span>
-                      <span class="text-emerald-600 dark:text-emerald-400 font-extrabold font-mono">+Rs. 85,000</span>
-                    </div>
-                    <div>
-                      <span class="text-[10px] text-slate-400 font-bold uppercase block">TOTAL EXPENSE</span>
-                      <span class="text-rose-500 dark:text-rose-400 font-extrabold font-mono">-Rs. 15,170</span>
-                    </div>
-                  </div>
+              <div class="p-2 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between text-[11px]">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center text-xs">⛽</span>
+                  <span class="font-bold text-white">Fuel Topup</span>
                 </div>
-
-                <div class="p-5 rounded-2xl bg-white dark:bg-[#12141F] border border-slate-200 dark:border-white/10 flex flex-col justify-between shadow-xs">
-                  <div>
-                    <div class="flex justify-between items-center text-xs mb-1">
-                      <span class="font-bold text-slate-400 uppercase text-[10px]">BALANCE</span>
-                      <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10">6 Days Left</span>
-                    </div>
-                    <div class="my-2 flex items-baseline gap-1">
-                      <span class="text-sm font-bold text-purple-600 dark:text-purple-400 font-mono">Rs.</span>
-                      <span class="text-3xl font-extrabold font-mono text-slate-900 dark:text-white tracking-tight">69,830</span>
-                    </div>
-                  </div>
-                </div>
+                <span class="font-mono font-extrabold text-rose-400 text-xs">-Rs. 3,500</span>
               </div>
             </div>
+
+            <!-- Home indicator bar -->
+            <div class="w-20 h-1 bg-white/20 rounded-full mx-auto my-2"></div>
           </div>
         </div>
-      </div>
+        <!-- PHONE FRAME 2: Visual Charts, Multi-Category & Native Dock Preview -->
+        <div class="w-full max-w-[320px] rounded-[44px] bg-slate-900 p-3 shadow-[0_25px_60px_-15px_rgba(99,102,241,0.4)] border-4 border-slate-700/60 relative">
+          <!-- Notch -->
+          <div class="w-24 h-4 bg-black rounded-full mx-auto mb-2 flex items-center justify-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-800"></span>
+            <span class="w-2 h-2 rounded-full bg-indigo-900/60"></span>
+          </div>
 
-      <!-- Mobile View Preview -->
-      <div id="mobilePreviewCard" class="hidden tilt-viewport">
-        <div class="tilt-card max-w-[340px] mx-auto rounded-[46px] bg-slate-900 dark:bg-[#0c0d15] p-3.5 border-4 border-slate-700 dark:border-slate-800 shadow-2xl text-left text-white">
-          <div class="rounded-[36px] overflow-hidden bg-[#F6F8FC] dark:bg-[#08090d] relative flex flex-col min-h-[590px]">
-            <div class="mcb-curved-banner rounded-b-[36px] pt-4 pb-6 px-4">
-              <div class="flex justify-between items-center text-[10px] font-bold opacity-80 mb-3 px-1 text-white">
-                <span>10:27</span>
-                <div class="flex items-center gap-1.5">
-                  <span>5G</span>
-                  <div class="w-4 h-2 border border-white rounded-xs p-0.5">
-                    <div class="w-full h-full bg-white rounded-2xs"></div>
-                  </div>
-                </div>
+          <div class="rounded-[36px] overflow-hidden bg-[#08090d] text-white border border-white/10 shadow-inner flex flex-col">
+            <div class="p-4 text-left border-b border-white/5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase tracking-wider text-purple-400">Visual Analytics</span>
+                <span class="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold">Donut + Trend</span>
               </div>
-
-              <div class="flex items-center justify-between mb-4">
-                <span class="mcb-action-btn px-3 py-1 rounded-xl text-[10px] font-extrabold">English</span>
-                <span class="mcb-action-btn px-4 py-1 rounded-full text-[10px] font-extrabold flex items-center gap-1">
-                  <span class="w-3 h-3 rounded-full bg-purple-500 text-white font-black text-[7px] flex items-center justify-center">Z</span>
-                  <span>Demo</span>
-                </span>
-                <div class="w-8 h-8 rounded-full mcb-action-btn flex items-center justify-center">
-                  <i data-lucide="moon" class="w-4 h-4 text-white"></i>
-                </div>
-              </div>
-
-              <div class="mcb-glass-card rounded-2xl p-4">
-                <div class="flex justify-between items-center text-[10px] text-purple-200 font-bold mb-1">
-                  <span>Personal Expenses</span>
-                  <span class="px-2 py-0.5 rounded-full bg-white/15 text-[9px]">PKR ⇄</span>
-                </div>
-                <div class="text-2xl font-black font-mono text-white mb-1">Rs. 69,830</div>
-                <div class="text-[9px] text-purple-200">Tap to Flip & Convert Currency</div>
-              </div>
+              <p class="text-[11px] font-bold text-slate-300 mt-1">Instant Category Distribution</p>
             </div>
 
-            <div class="p-3.5 space-y-3 flex-1">
-              <div class="p-4 rounded-2xl app-card">
-                <div class="flex justify-between items-center text-[10px] text-slate-400 font-bold">
-                  <span>TOTAL MONTHLY SPENDING</span>
-                  <span class="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">Safe Budget 🌿</span>
+            <!-- Mini Visual Breakdown -->
+            <div class="p-3.5 space-y-2.5 text-left">
+              <div class="p-2.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                <div class="flex justify-between items-center text-[10px] font-bold">
+                  <span class="text-slate-300">Food & Dining</span>
+                  <span class="font-mono text-purple-300">Rs. 18,200 (42%)</span>
                 </div>
-                <div class="my-2">
-                  <span class="text-2xl font-black font-mono text-slate-900 dark:text-white">Rs. 15,170</span>
+                <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                  <div style="width: 42%" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"></div>
                 </div>
-                <div class="pt-2 border-t border-slate-100 dark:border-white/10 flex justify-between text-[11px] font-mono font-bold">
-                  <span class="text-emerald-600 dark:text-emerald-400">+Rs. 85,000</span>
-                  <span class="text-rose-500 dark:text-rose-400">-Rs. 15,170</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                <div class="flex justify-between items-center text-[10px] font-bold">
+                  <span class="text-slate-300">Fuel & Travel</span>
+                  <span class="font-mono text-pink-300">Rs. 12,000 (28%)</span>
+                </div>
+                <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                  <div style="width: 28%" class="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full"></div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                <div class="flex justify-between items-center text-[10px] font-bold">
+                  <span class="text-slate-300">Groceries & Home</span>
+                  <span class="font-mono text-emerald-300">Rs. 9,400 (22%)</span>
+                </div>
+                <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                  <div style="width: 22%" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white/90 dark:bg-[#12141F] border-t border-slate-200 dark:border-white/10 px-5 py-2.5 flex items-center justify-between relative mt-auto text-slate-500 dark:text-slate-400">
-              <div class="flex flex-col items-center text-purple-600 dark:text-purple-400 text-[9px] font-bold">
-                <i data-lucide="layout-grid" class="w-4 h-4"></i><span>Home</span>
-              </div>
-              <div class="flex flex-col items-center text-[9px] font-bold">
-                <i data-lucide="calendar" class="w-4 h-4"></i><span>Calendar</span>
-              </div>
-              <div class="-mt-7">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-purple-600/50">
-                  <i data-lucide="plus" class="w-5 h-5"></i>
-                </div>
-              </div>
-              <div class="flex flex-col items-center text-[9px] font-bold">
-                <i data-lucide="receipt" class="w-4 h-4"></i><span>Records</span>
-              </div>
-              <div class="flex flex-col items-center text-[9px] font-bold">
-                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i><span>Settings</span>
-              </div>
+            <!-- Simulated Floating Dock at Bottom -->
+            <div class="mx-3 mb-2 p-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-around text-xs">
+              <span class="text-purple-400">🏠</span>
+              <span class="text-slate-400">📅</span>
+              <span class="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center font-bold text-white text-[11px]">+</span>
+              <span class="text-slate-400">🧾</span>
+              <span class="text-slate-400">⚙️</span>
             </div>
+
+            <div class="w-20 h-1 bg-white/20 rounded-full mx-auto my-1.5"></div>
           </div>
         </div>
+
       </div>
     </div>
-  </div>
 
-  <div id="landingDetailsSection" class="max-w-6xl mx-auto px-6 py-16 space-y-20 border-t border-slate-200 dark:border-white/10 text-left bg-transparent text-slate-800 dark:text-slate-100">
-    <section class="space-y-10">
-      <div class="text-center max-w-3xl mx-auto space-y-3">
-        <span class="text-purple-600 dark:text-purple-400 font-extrabold text-xs uppercase tracking-widest bg-purple-50 dark:bg-purple-500/10 px-3.5 py-1.5 rounded-full border border-purple-200 dark:border-purple-500/20">The Smart Advantage</span>
-        <h3 class="text-2xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Why Choose Expense Tracker?</h3>
-        <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-          Aam expense apps bohot complicated hoti hain ya har cheez ke paise maangti hain. Expense Tracker ko specifically daily hisab kitaab ko 100% simple, fast, aur private rakhne ke liye banaya gaya hai.
-        </p>
+    <!-- ==================== WHY CHOOSE US SECTION ==================== -->
+    <div class="max-w-5xl mx-auto px-6 py-12">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="text-[10px] font-extrabold uppercase tracking-widest text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-500/20">Why Choose Expense Tracker</span>
+        <h3 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mt-3">Designed for Speed, Zero Clutter & Complete Financial Control</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Har roz ka hisab-kitab aasan, bina kisi subscription ya complex accounting terms ke. Sab kuch direct aapke phone par bina kisi rukawat ke chalta hai.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="p-6 rounded-3xl app-card space-y-3">
-          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 flex items-center justify-center text-xl">🛡️</div>
-          <h4 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">100% Data Ownership</h4>
-          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Aapka data kisi third-party ad network ko nahi jata. Aap guest mode mein bina internet ke chala sakte hain ya encrypted cloud backup on kar sakte hain.</p>
+        <div class="app-card rounded-3xl p-6 relative overflow-hidden group hover:border-purple-500/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-4">
+            <i data-lucide="zap" class="w-6 h-6"></i>
+          </div>
+          <h4 class="text-sm font-extrabold text-slate-900 dark:text-white mb-1.5">Instant PWA & Offline First</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Play Store ya App Store ke chakkar ke baghair direct "Add to Home Screen" karein. Internet na bhi ho tab bhi poora ledger smoothly chalta hai.</p>
         </div>
-        <div class="p-6 rounded-3xl app-card space-y-3">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-xl">⚡</div>
-          <h4 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Instant 1-Tap Entry</h4>
-          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Dukan par khade khade sirf 3 second lagte hain. Amount likhein, category tap karein aur kharcha save. Koi faltu forms ya intezar nahi.</p>
+
+        <div class="app-card rounded-3xl p-6 relative overflow-hidden group hover:border-purple-500/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <h4 class="text-sm font-extrabold text-slate-900 dark:text-white mb-1.5">100% Private & Encrypted</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Aapka paisa aur transactions ka record sirf aapke device ke local storage mein secure rehta hai. Koi third-party ads ya data tracking nahi.</p>
         </div>
-        <div class="p-6 rounded-3xl app-card space-y-3">
-          <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center text-xl">💰</div>
-          <h4 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">No Overspending Shock</h4>
-          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Daily Safe-To-Spend engine rozana calculate karta hai ke mahine ke bache hue dino ke hisab se aaj kitna kharch karna safe hai.</p>
+
+        <div class="app-card rounded-3xl p-6 relative overflow-hidden group hover:border-purple-500/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-pink-50 dark:bg-pink-500/10 text-pink-600 dark:text-pink-400 flex items-center justify-center mb-4">
+            <i data-lucide="pie-chart" class="w-6 h-6"></i>
+          </div>
+          <h4 class="text-sm font-extrabold text-slate-900 dark:text-white mb-1.5">Smart Visual Analytics</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Real-time donut breakdown aur monthly budget caps se ek glance mein pata chale ke paisa kahan ja raha hai aur kitni bachat bachi hai.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SIMPLE 3-STEP WORKFLOW ==================== -->
+    <div class="max-w-4xl mx-auto px-6 py-8 text-center">
+      <h3 class="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-2">Simple 3-Step Workflow</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-8">Sirf 10 seconds mein din ka kharcha log karein</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-purple-600 text-white font-black text-sm flex items-center justify-center shadow-lg shadow-purple-600/40 mb-3">1</div>
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Set Monthly Budget</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Apna monthly target set karein taake app aapko overspending se bacha sake.</p>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-lg shadow-indigo-600/40 mb-3">2</div>
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Quick Single-Tap (+) Entry</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Curved dock ke center (+) button par tap karein aur amount add karein.</p>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-lg shadow-emerald-600/40 mb-3">3</div>
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-1">Export Anytime (CSV / Excel)</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Mahine ke aakhir mein aik click se poora record spreadsheet mein download karein.</p>
+        </div>
+      </div>
+    </div>
+    <!-- ==================== BIG CTA BANNER ==================== -->
+    <section class="max-w-5xl mx-auto px-6 py-12">
+      <div class="rounded-3xl p-8 md:p-12 bg-gradient-to-tr from-purple-900/60 via-indigo-900/50 to-slate-900/80 border border-purple-500/30 backdrop-blur-2xl text-center relative overflow-hidden shadow-2xl">
+        <div class="relative z-10 max-w-xl mx-auto space-y-4">
+          <h2 class="text-2xl md:text-4xl font-black text-white tracking-tight">Ready to Master Your Expenses?</h2>
+          <p class="text-xs md:text-sm text-purple-200">Bina kisi fee ya subscription ke abhi direct web application open karein.</p>
+          <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
+            <button onclick="showAppWorkspace()" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-purple-600/40 active:scale-95 transition">
+              Launch Web App 🚀
+            </button>
+          </div>
         </div>
       </div>
     </section>
 
-    <footer class="pt-10 border-t border-slate-200 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-slate-500 text-[11px]">
+    <!-- ==================== PROFESSIONAL FOOTER ==================== -->
+    <footer class="max-w-6xl mx-auto px-6 pt-12 pb-8 border-t border-slate-200/50 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
       <div>
-        <p class="font-extrabold text-slate-700 dark:text-slate-400 uppercase tracking-wider">Expense Tracker • Production v2.8</p>
-        <p class="mt-0.5">Built with HTML5, Tailwind CSS, Lucide & Supabase</p>
+        <p class="font-bold text-slate-700 dark:text-slate-300">Expense Tracker • Native v2.9</p>
+        <p class="text-[11px] text-purple-500 font-mono mt-0.5">Created by Zeeshan Ali Khan</p>
       </div>
-      <div class="text-center md:text-right">
-        <p class="text-slate-700 dark:text-slate-300 font-bold">Created by Zeeshan Ali Khan</p>
-        <p class="mt-0.5">All rights reserved © 2026</p>
-      </div>
+      <p class="text-[11px] text-slate-500">© 2026 All Rights Reserved • Built with Tailwind CSS & PWA Standards</p>
     </footer>
+
   </div>
-<!-- ==================== 2. MAIN ACTIVE APP WORKSPACE ==================== -->
-  <div id="mainAppSection" class="hidden min-h-screen bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 flex flex-col md:flex-row">
+
+  <!-- ==================== 2. MAIN ACTIVE APP WORKSPACE ==================== -->
+  <div id="mainAppSection" style="display: none;" class="min-h-screen bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 flex-col md:flex-row">
     <div id="customToastBox" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-[100] max-w-sm w-[90%] bg-white dark:bg-[#1E2132] border border-slate-200/80 dark:border-white/10 p-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all">
       <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
         <i data-lucide="info" class="w-4 h-4"></i>
@@ -447,7 +475,7 @@
     <aside class="hidden md:flex flex-col justify-between w-64 lg:w-72 bg-white dark:bg-[#0f111a] border-r border-slate-200/80 dark:border-white/5 p-6 sticky top-0 h-screen shrink-0 z-20">
       <div class="space-y-6">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center font-extrabold text-base shadow-lg shadow-purple-600/30">ET</div>
+          <img src="app-icon.png" alt="Logo" class="w-10 h-10 rounded-2xl shadow-lg shadow-purple-600/30 object-cover">
           <div>
             <h1 class="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">EXPENSE TRACKER</h1>
             <p class="text-[10px] text-slate-400 font-semibold">Native iOS & Android</p>
@@ -504,24 +532,27 @@
         </div>
       </div>
     </aside>
-
     <div class="flex-1 flex flex-col min-w-0">
       <!-- MCB TOP HERO HEADER -->
       <div id="mcbHeaderContainer" class="md:hidden mcb-curved-banner rounded-b-[40px] pt-4 pb-7 px-4 shadow-2xl relative overflow-hidden transition-all duration-300">
-        <div class="flex items-center justify-between mb-4">
+        
+        <!-- TOP ROW: Lang, Dynamic User Name, Theme -->
+        <div class="flex items-center justify-between mb-4 relative">
           <button onclick="cycleLanguage()" class="mcb-action-btn px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1 shadow-sm shrink-0" id="langSwitchBtn">
             <span id="langMainLabel">English</span>
           </button>
-          <button onclick="openDemoModal()" class="mcb-action-btn px-4 py-1.5 rounded-full text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-sm mx-auto">
-            <span class="w-3.5 h-3.5 rounded-full bg-purple-500 text-white font-black text-[8px] flex items-center justify-center shadow-xs">Z</span>
-            <span id="lblDemoBtn">Demo</span>
-          </button>
+          
+          <!-- DYNAMIC USER NAME -->
+          <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 max-w-[180px] pointer-events-none">
+            <span id="topBarUserDisplayName" class="text-xs md:text-sm font-black text-white tracking-wide truncate uppercase"></span>
+          </div>
+
           <button onclick="toggleTheme()" class="w-9 h-9 rounded-full mcb-action-btn flex items-center justify-center shadow-sm shrink-0">
             <i id="themeIcon" data-lucide="moon" class="w-4 h-4 text-white"></i>
           </button>
         </div>
 
-        <!-- 3D FLIP CARD CONTAINER (SHARP HD & WORKING FLIP) -->
+        <!-- 3D FLIP BALANCE CARD -->
         <div class="flip-card-container">
           <div id="mcbFlipCard" class="flip-card-inner">
 
@@ -529,9 +560,10 @@
             <div onclick="openBooksDrawer()" class="flip-card-front mcb-glass-card rounded-3xl p-5 cursor-pointer active:scale-[0.98] transition select-none">
               <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
-                  <i data-lucide="book-open" class="w-4 h-4 text-purple-200"></i>
+                  <div class="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-purple-200">
+                    <i data-lucide="menu" class="w-3.5 h-3.5"></i>
+                  </div>
                   <span id="activeBookTitle" class="text-xs font-black text-white tracking-wide">Personal Expenses</span>
-                  <span class="text-[10px] text-purple-300 opacity-80">▼</span>
                 </div>
                 <button onclick="event.stopPropagation(); flipCurrencyCard(true);" class="px-2.5 py-0.5 rounded-full bg-white/20 hover:bg-white/30 text-[9px] font-bold text-white uppercase tracking-wider flex items-center gap-1 active:scale-90 transition">
                   <span class="curr-symbol">PKR</span>
@@ -558,7 +590,7 @@
               </div>
             </div>
 
-            <!-- BACK SIDE: Live Currency Converter -->
+            <!-- BACK SIDE: Currency Converter -->
             <div class="flip-card-back mcb-glass-card rounded-3xl p-4 text-white flex flex-col justify-between">
               <div class="flex items-center justify-between pb-2 border-b border-white/15">
                 <div class="flex items-center gap-1.5 text-xs font-black text-purple-200">
@@ -606,10 +638,27 @@
       </div>
 
       <!-- Main Canvas Area -->
-      <main id="mainCanvasArea" class="flex-1 p-4 md:p-8 pb-28 md:pb-8 max-w-5xl w-full mx-auto overflow-y-auto no-scrollbar">
+      <main id="mainCanvasArea" class="flex-1 p-4 md:p-8 pb-32 md:pb-8 max-w-5xl w-full mx-auto overflow-y-auto no-scrollbar">
 
         <!-- VIEW 1: DASHBOARD -->
         <div id="viewDashboard" class="space-y-5">
+          
+          <!-- AI ADVISOR CARD (NEW FEATURE) -->
+          <div class="p-4 rounded-3xl bg-gradient-to-tr from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 border border-purple-100 dark:border-purple-500/20 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between mb-2.5">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white shadow-md">
+                  <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="text-[11px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-300" id="lblAiAdvisorTitle">AI Financial Advisor</span>
+              </div>
+              <span class="flex h-2 w-2 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+              </span>
+            </div>
+            <p id="aiAdvisorMessage" class="text-xs text-slate-700 dark:text-slate-300 font-medium leading-relaxed"></p>
+          </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div class="md:col-span-2 rounded-3xl app-card p-6 flex flex-col justify-between relative overflow-hidden transition-all">
               <div class="flex justify-between items-center text-xs">
@@ -666,16 +715,49 @@
             </div>
           </div>
 
-          <!-- Charts & Categories -->
+          <!-- Charts Section: FLIP CARD -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div class="rounded-3xl app-card p-5 flex flex-col items-center justify-center">
-              <span id="lblSpendingAnalytics" class="text-[11px] font-black text-slate-400 uppercase tracking-wider self-start mb-2">Spending Visual Breakdown</span>
-              <div class="relative w-44 h-44 flex items-center justify-center">
-                <canvas id="categoryChart"></canvas>
-                <div id="chartCenterText" class="absolute text-center pointer-events-none">
-                  <span class="text-[10px] text-slate-400 block font-bold">TOTAL</span>
-                  <span id="chartCenterAmount" class="text-xs font-black font-mono text-slate-900 dark:text-white">0</span>
+            
+            <div class="flip-card-container min-h-[260px]">
+              <div id="chartFlipCard" class="flip-card-inner h-full">
+                
+                <!-- FRONT: Circular Donut Chart -->
+                <div class="flip-card-front rounded-3xl app-card p-5 flex flex-col items-center justify-between h-full">
+                  <div class="w-full flex items-center justify-between mb-2">
+                    <span id="lblSpendingAnalytics" class="text-[11px] font-black text-slate-400 uppercase tracking-wider">Spending Visual Breakdown</span>
+                    <button onclick="flipChartCard(true)" title="View Trend Lines" class="p-1.5 rounded-xl bg-purple-50 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400 hover:scale-105 transition flex items-center gap-1 text-[10px] font-bold">
+                      <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                      <span>Trend</span>
+                    </button>
+                  </div>
+                  
+                  <div class="relative w-44 h-44 flex items-center justify-center my-auto">
+                    <canvas id="categoryChart"></canvas>
+                    <div id="chartCenterText" class="absolute text-center pointer-events-none">
+                      <span class="text-[10px] text-slate-400 block font-bold">TOTAL</span>
+                      <span id="chartCenterAmount" class="text-xs font-black font-mono text-slate-900 dark:text-white">0</span>
+                    </div>
+                  </div>
                 </div>
+
+                <!-- BACK: Trending Lines Chart -->
+                <div class="flip-card-back rounded-3xl app-card p-5 flex flex-col justify-between h-full">
+                  <div class="w-full flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                      <span>Daily Expense Trend</span>
+                    </span>
+                    <button onclick="flipChartCard(false)" title="Back to Circle" class="p-1.5 rounded-xl bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:scale-105 transition flex items-center gap-1 text-[10px] font-bold">
+                      <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i>
+                      <span>Donut</span>
+                    </button>
+                  </div>
+
+                  <div class="w-full h-44 my-auto relative">
+                    <canvas id="trendingLineChart"></canvas>
+                  </div>
+                </div>
+
               </div>
             </div>
 
@@ -731,7 +813,6 @@
             </div>
           </div>
         </div>
-
         <!-- VIEW 3: TRANSACTIONS RECORD -->
         <div id="viewTransactions" class="hidden space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
@@ -745,10 +826,13 @@
             
             <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
               <button onclick="filterTxCategory('all')" class="cat-pill active px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-600 text-white shrink-0 transition" data-cat="all">All</button>
-              <button onclick="filterTxCategory('Food/Drink')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Food/Drink">Food/Drink</button>
-              <button onclick="filterTxCategory('Fuel')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Fuel">Fuel</button>
+              <button onclick="filterTxCategory('Food/Drink')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Food/Drink">Food</button>
               <button onclick="filterTxCategory('Groceries')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Groceries">Groceries</button>
+              <button onclick="filterTxCategory('Fuel')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Fuel">Fuel</button>
+              <button onclick="filterTxCategory('Transport')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Transport">Transport</button>
               <button onclick="filterTxCategory('Bills')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Bills">Bills</button>
+              <button onclick="filterTxCategory('Shopping')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Shopping">Shopping</button>
+              <button onclick="filterTxCategory('Health')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Health">Health</button>
               <button onclick="filterTxCategory('Other')" class="cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition" data-cat="Other">Other</button>
             </div>
           </div>
@@ -761,11 +845,11 @@
           <div id="fullLedgerFeed" class="space-y-2 mt-2"></div>
         </div>
 
-        <!-- VIEW 4: SETTINGS (PERFECT VERTICAL ALIGNMENT & CIRCULAR DP) -->
+        <!-- VIEW 4: SETTINGS -->
         <div id="viewSettings" class="hidden space-y-5 max-w-2xl mx-auto">
           <div class="flex items-center justify-between pb-2 border-b border-slate-200/80 dark:border-white/10 md:hidden">
             <h2 class="text-base font-extrabold text-slate-900 dark:text-white" id="settingsMobileHeaderTitle">Settings</h2>
-            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-xl">v2.8</span>
+            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-xl">v2.9</span>
           </div>
 
           <div class="app-card rounded-3xl p-5 md:p-6 space-y-4">
@@ -788,6 +872,18 @@
                   <button id="btnRemoveDp" onclick="removeProfileDp(event)" class="hidden text-[10px] text-rose-500 font-bold hover:underline">Remove DP</button>
                 </p>
               </div>
+            </div>
+
+            <!-- DEMO MODE ROW -->
+            <div class="p-3.5 rounded-2xl bg-purple-50/70 dark:bg-purple-500/10 border border-purple-200/80 dark:border-purple-500/20 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-extrabold text-purple-900 dark:text-purple-200 block">Explore Demo Experience</span>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400">Load sample records & learn smart tracking</span>
+              </div>
+              <button onclick="openDemoModal()" class="px-3.5 py-1.5 rounded-xl bg-purple-600 text-white font-extrabold text-xs shadow-md shadow-purple-600/30 hover:bg-purple-700 transition flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span>Open Demo</span>
+              </button>
             </div>
 
             <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center justify-between">
@@ -835,53 +931,54 @@
               Save Settings
             </button>
 
+            <!-- Wipe Records Button -->
             <button onclick="openWipeDateModal()" id="btnWipe" class="w-full py-2.5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200/80 dark:border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold active:scale-95 transition flex items-center justify-center gap-1.5">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
-              <span>Wipe Current Book Records</span>
+              <span>Wipe Book Records by Date</span>
             </button>
           </div>
 
           <div class="text-center py-4 space-y-0.5">
-            <p class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Expense Tracker • Production v2.8</p>
+            <p class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Expense Tracker • Production v2.9</p>
             <p class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Created by Zeeshan Ali Khan</p>
           </div>
         </div>
 
       </main>
 
-      <!-- Mobile Floating Dock -->
-      <nav class="md:hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto px-6 py-2.5 bg-white/90 dark:bg-[#11131f]/90 backdrop-blur-2xl rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.7)] border border-slate-200/80 dark:border-white/10 flex items-center justify-between z-30">
-        <button onclick="switchTab('dashboard')" id="navDashboard" class="flex flex-col items-center justify-center gap-0.5 active:scale-95 transition">
-          <span class="text-lg leading-none">🏠</span>
+      <!-- Mobile Native Dock (Fixed to Bottom & Safe Area Aware) -->
+      <nav class="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white/95 dark:bg-[#11131f]/95 backdrop-blur-2xl border-t border-slate-200/80 dark:border-white/10 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center justify-around z-40 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
+        <button onclick="switchTab('dashboard')" id="navDashboard" class="flex-1 flex flex-col items-center justify-center gap-1 active:scale-95 transition">
+          <i data-lucide="home" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
           <span id="dockHome" class="text-[10px] font-bold text-purple-600 dark:text-purple-400">Home</span>
         </button>
 
-        <button onclick="switchTab('calendar')" id="navCalendar" class="flex flex-col items-center justify-center gap-0.5 active:scale-95 transition opacity-80 hover:opacity-100">
-          <span class="text-lg leading-none">📅</span>
+        <button onclick="switchTab('calendar')" id="navCalendar" class="flex-1 flex flex-col items-center justify-center gap-1 active:scale-95 transition opacity-70 hover:opacity-100">
+          <i data-lucide="calendar" class="w-5 h-5 text-slate-500 dark:text-slate-400"></i>
           <span id="dockCalendar" class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Calendar</span>
         </button>
 
-        <div class="-mt-8 flex justify-center">
-          <button onclick="openAddModal()" class="w-14 h-14 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-[0_10px_25px_rgba(109,40,217,0.5)] border-2 border-white/20 active:scale-90 transition transform">
+        <div class="flex-1 flex justify-center -mt-7">
+          <button onclick="openAddModal()" class="w-14 h-14 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-[0_10px_25px_rgba(109,40,217,0.55)] border-4 border-white dark:border-[#11131f] active:scale-90 transition transform cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
             </svg>
           </button>
         </div>
 
-        <button onclick="switchTab('transactions')" id="navTransactions" class="flex flex-col items-center justify-center gap-0.5 active:scale-95 transition opacity-80 hover:opacity-100">
-          <span class="text-lg leading-none">🧾</span>
+        <button onclick="switchTab('transactions')" id="navTransactions" class="flex-1 flex flex-col items-center justify-center gap-1 active:scale-95 transition opacity-70 hover:opacity-100">
+          <i data-lucide="receipt" class="w-5 h-5 text-slate-500 dark:text-slate-400"></i>
           <span id="dockRecords" class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Records</span>
         </button>
 
-        <button onclick="switchTab('settings')" id="navSettings" class="flex flex-col items-center justify-center gap-0.5 active:scale-95 transition opacity-80 hover:opacity-100">
-          <span class="text-lg leading-none">⚙️</span>
+        <button onclick="switchTab('settings')" id="navSettings" class="flex-1 flex flex-col items-center justify-center gap-1 active:scale-95 transition opacity-70 hover:opacity-100">
+          <i data-lucide="settings" class="w-5 h-5 text-slate-500 dark:text-slate-400"></i>
           <span id="dockSettings" class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Settings</span>
         </button>
       </nav>
     </div>
   </div>
-<!-- MODAL: ADD RECORD (WITH CLEAR RECEIPT SUPPORT) -->
+  <!-- MODAL: ADD RECORD (ALL 8 CATEGORIES GRID + SMART OCR RECEIPT SCANNER) -->
   <div id="addModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-end md:items-center justify-center md:p-4">
     <div class="w-full max-w-md bg-white dark:bg-[#11131f] rounded-t-[32px] md:rounded-3xl p-6 border-t md:border border-slate-200/80 dark:border-white/10 max-h-[92vh] overflow-y-auto no-scrollbar shadow-2xl">
       <div class="flex justify-between items-center mb-4">
@@ -892,6 +989,20 @@
         <button id="modalTabExpense" onclick="setModalType('expense')" class="py-2.5 rounded-xl text-xs font-extrabold transition bg-rose-600 text-white shadow-sm">I Spent</button>
         <button id="modalTabIncome" onclick="setModalType('income')" class="py-2.5 rounded-xl text-xs font-extrabold transition text-slate-500 dark:text-slate-400">I Received</button>
       </div>
+      <!-- Modern Purple Pill Voice Button -->
+      <div class="mb-4">
+        <button 
+          type="button" 
+          id="btnVoiceAdd"
+          onclick="startVoiceExpense()" 
+          class="w-full flex items-center justify-between px-4 py-3 rounded-full bg-purple-50 hover:bg-purple-100/80 dark:bg-[#251b45] dark:hover:bg-[#2e2154] border-2 border-purple-500/70 text-purple-700 dark:text-purple-200 transition-all duration-200 shadow-sm active:scale-[0.98]">
+          <div class="flex items-center gap-3">
+            <span class="text-base text-purple-600 dark:text-purple-300">🎙️</span>
+            <span id="voiceBtnText" class="text-xs font-bold tracking-wide">Add with Voice</span>
+          </div>
+          <span class="text-[10px] font-medium opacity-70 bg-purple-200/60 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300 px-2 py-0.5 rounded-full">Tap & Speak</span>
+        </button>
+      </div>
       <div class="bg-slate-50 dark:bg-black/30 rounded-2xl p-4 border border-slate-200/70 dark:border-white/5 mb-4 text-center">
         <span id="lblEnterAmount" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">ENTER AMOUNT</span>
         <div class="flex items-center justify-center gap-1.5">
@@ -899,27 +1010,46 @@
           <input type="number" id="modalAmountInput" placeholder="0" class="w-48 bg-transparent text-center text-3xl font-extrabold font-mono text-slate-900 dark:text-white focus:outline-none placeholder-slate-400">
         </div>
       </div>
+
+      <!-- 8 Complete Categories Grid -->
       <div id="categoryPickerContainer" class="mb-4">
         <span id="lblSelectCategory" class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2 px-1">Select a Category</span>
-        <div class="grid grid-cols-4 gap-2.5">
+        <div class="grid grid-cols-4 gap-2">
+          <button type="button" onclick="selectCategory('Food/Drink', '🍔')" class="cat-btn p-2 rounded-2xl bg-purple-50 border-2 border-purple-500 text-purple-700 dark:bg-purple-500/20 dark:border-purple-500 dark:text-purple-300 flex flex-col items-center gap-1 transition active:scale-95" data-category="Food/Drink">
+            <span class="w-7 h-7 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs">🍔</span>
+            <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Food</span>
+          </button>
           <button type="button" onclick="selectCategory('Groceries', '🛒')" class="cat-btn p-2 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/5 flex flex-col items-center gap-1 transition active:scale-95" data-category="Groceries">
-            <span class="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm">🛒</span>
-            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300">Groceries</span>
+            <span class="w-7 h-7 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">🛒</span>
+            <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Groceries</span>
           </button>
           <button type="button" onclick="selectCategory('Fuel', '⛽')" class="cat-btn p-2 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/5 flex flex-col items-center gap-1 transition active:scale-95" data-category="Fuel">
-            <span class="w-8 h-8 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm">⛽</span>
-            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300">Fuel</span>
+            <span class="w-7 h-7 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs">⛽</span>
+            <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Fuel</span>
           </button>
-          <button type="button" onclick="selectCategory('Food/Drink', '🍔')" class="cat-btn p-2 rounded-2xl bg-purple-50 border-2 border-purple-500 text-purple-700 dark:bg-purple-500/20 dark:border-purple-500 dark:text-purple-300 flex flex-col items-center gap-1 transition active:scale-95" data-category="Food/Drink">
-            <span class="w-8 h-8 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-sm">🍔</span>
-            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300">Food/Drink</span>
+          <button type="button" onclick="selectCategory('Transport', '🚗')" class="cat-btn p-2 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/5 flex flex-col items-center gap-1 transition active:scale-95" data-category="Transport">
+            <span class="w-7 h-7 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-xs">🚗</span>
+            <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Transport</span>
           </button>
           <button type="button" onclick="selectCategory('Bills', '⚡')" class="cat-btn p-2 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/5 flex flex-col items-center gap-1 transition active:scale-95" data-category="Bills">
-            <span class="w-8 h-8 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm">⚡</span>
-            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300">Bills</span>
+            <span class="w-7 h-7 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs">⚡</span>
+            <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Bills</span>
+          </button>
+          <button type="button" onclick="selectCategory('Shopping', '🛍️')" class="cat-btn p-2 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/5 flex flex-col items-center gap-1 transition active:scale-95" data-category="Shopping">
+            <span class="w-7 h-7 rounded-full bg-pink-500/10 text-pink-600 dark:text-pink-400 flex items-center justify-center text-xs">🛍️</span>
+            <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Shopping</span>
+          </button>
+          <button type="button" onclick="selectCategory('Health', '💊')" class="cat-btn p-2 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/5 flex flex-col items-center gap-1 transition active:scale-95" data-category="Health">
+            <span class="w-7 h-7 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center text-xs">💊</span>
+            <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Health</span>
+          </button>
+          <button type="button" onclick="selectCategory('Other', '✏️')" class="cat-btn p-2 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/5 flex flex-col items-center gap-1 transition active:scale-95" data-category="Other">
+            <span class="w-7 h-7 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs">✏️</span>
+            <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Other</span>
           </button>
         </div>
       </div>
+
       <div id="customOtherBox" class="hidden mb-4 p-3 rounded-2xl bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20">
         <label id="lblCustomOther" class="block text-[11px] font-bold text-purple-700 dark:text-purple-300 mb-1">✏️ Custom Category:</label>
         <input type="text" id="customOtherInput" placeholder="e.g. Barber, Bike Service" class="w-full bg-white dark:bg-black/50 border border-purple-300 dark:border-purple-500/40 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none">
@@ -929,18 +1059,19 @@
         <input type="text" id="modalTitleInput" placeholder="e.g. Lunch with friends" class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200/70 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none">
       </div>
 
+      <!-- SMART SCAN / ATTACH RECEIPT -->
       <div class="mb-4">
         <div class="flex items-center justify-between mb-1">
-          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Attach Receipt / Bill (Optional)</label>
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Smart Receipt Scanner (AI Auto-Fill)</label>
           <button id="btnClearReceipt" onclick="clearReceiptPhoto()" class="hidden text-[10px] text-rose-500 font-bold hover:underline">Remove</button>
         </div>
-        <div class="flex items-center gap-3">
-          <label class="flex-1 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl p-2.5 flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition">
-            <i data-lucide="camera" class="w-4 h-4 text-purple-600 dark:text-purple-400"></i>
-            <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Upload Photo / Snap Bill</span>
-            <input type="file" id="receiptFileInput" accept="image/*" onchange="handleReceiptUpload(event)" class="hidden">
+        <div class="flex flex-col gap-2">
+          <label class="border-2 border-dashed border-purple-400/50 dark:border-purple-500/30 rounded-2xl p-3 flex items-center justify-center gap-2 cursor-pointer bg-purple-50/50 dark:bg-purple-500/5 hover:bg-purple-100/50 dark:hover:bg-purple-500/10 transition">
+            <i data-lucide="scan-line" class="w-4 h-4 text-purple-600 dark:text-purple-400 animate-pulse"></i>
+            <span id="ocrStatusText" class="text-xs font-bold text-purple-700 dark:text-purple-300">Scan Bill / Auto-Fill Amount</span>
+            <input type="file" id="receiptFileInput" accept="image/*" onchange="handleSmartReceiptScan(event)" class="hidden">
           </label>
-          <img id="receiptPreviewImg" class="hidden w-11 h-11 rounded-xl object-cover border border-slate-200 dark:border-white/10 shrink-0" alt="Receipt">
+          <img id="receiptPreviewImg" class="hidden w-full h-24 rounded-xl object-cover border border-slate-200 dark:border-white/10" alt="Receipt">
         </div>
       </div>
 
@@ -950,68 +1081,102 @@
     </div>
   </div>
 
-  <!-- MODAL: AUTH (COMPLETE EMAIL, PASSWORD, SIGNUP & GOOGLE) -->
+  <!-- MODAL: AUTH & FORGOT PASSWORD FLOW -->
   <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-sm app-card rounded-3xl p-6 relative shadow-2xl">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-xs text-slate-400 hover:text-slate-800 dark:hover:text-white">✕</button>
 
-      <div class="w-11 h-11 rounded-2xl bg-purple-600 text-white font-extrabold flex items-center justify-center mb-3 shadow-lg shadow-purple-600/30">
-        <i data-lucide="cloud" class="w-6 h-6"></i>
+      <!-- Standard Login/Signup Box -->
+      <div id="authFormStandardBox">
+        <div class="w-11 h-11 rounded-2xl bg-purple-600 text-white font-extrabold flex items-center justify-center mb-3 shadow-lg shadow-purple-600/30">
+          <i data-lucide="cloud" class="w-6 h-6"></i>
+        </div>
+
+        <h3 id="lblAuthTitle" class="text-base font-extrabold text-slate-900 dark:text-white">Cloud Account & Sync</h3>
+        <p id="lblAuthSub" class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Sync your records across all devices safely with Supabase.</p>
+
+        <div id="authLoggedOutView" class="mt-4 space-y-3">
+          <button onclick="signInWithGoogle()" class="w-full py-2.5 rounded-xl border border-slate-200 dark:border-white/15 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 font-bold text-xs text-slate-700 dark:text-white flex items-center justify-center gap-2 transition active:scale-95">
+            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            <span id="lblAuthGoogle">Continue with Google</span>
+          </button>
+
+          <div class="flex items-center gap-2 my-2">
+            <div class="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
+            <span id="lblAuthOrEmail" class="text-[10px] text-slate-400 font-bold uppercase">or email</span>
+            <div class="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
+          </div>
+
+          <div>
+            <label id="lblAuthNameInput" class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Full Name</label>
+            <input type="text" id="authNameInput" placeholder="zeeshan ali khan" class="w-full bg-slate-50 dark:bg-[#08090d] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-purple-500">
+          </div>
+
+          <div>
+            <label id="lblAuthEmailInput" class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email Address</label>
+            <input type="email" id="authEmailInput" placeholder="name@example.com" class="w-full bg-slate-50 dark:bg-[#08090d] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-purple-500">
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label id="lblAuthPassInput" class="text-[10px] font-bold text-slate-400 uppercase">Password</label>
+              <button type="button" onclick="toggleForgotPasswordView(true)" class="text-[10px] font-bold text-purple-600 dark:text-purple-400 hover:underline">
+                Forgot password?
+              </button>
+            </div>
+            <input type="password" id="authPasswordInput" placeholder="••••••••" class="w-full bg-slate-50 dark:bg-[#08090d] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-purple-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="signInEmail()" id="btnAuthLogin" class="py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-md shadow-purple-600/30 transition active:scale-95">Log In</button>
+            <button onclick="signUpEmail()" id="btnAuthSignup" class="py-2.5 rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 font-extrabold text-xs transition active:scale-95">Sign Up</button>
+          </div>
+        </div>
+
+        <div id="authLoggedInView" class="hidden mt-4 space-y-4">
+          <div class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
+            <span id="lblAccountConnected" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase block">Account Connected</span>
+            <span id="activeUserEmailText" class="text-xs font-extrabold text-emerald-950 dark:text-emerald-200 font-mono break-all"></span>
+          </div>
+          <button onclick="syncDataToCloudNow()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span id="lblSyncCloudBtn">Sync Now to Cloud</span>
+          </button>
+          <button onclick="signOutUser()" id="btnSignOutAuth" class="w-full py-2 bg-slate-100 dark:bg-white/10 text-rose-500 font-bold text-xs rounded-xl transition">
+            Sign Out / Go Offline
+          </button>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 text-center">
+          <span id="lblAuthEncrypted" class="text-[10px] text-slate-400 leading-tight block">100% End-to-End Encrypted. Supabase Protected.</span>
+        </div>
       </div>
 
-      <h3 id="lblAuthTitle" class="text-base font-extrabold text-slate-900 dark:text-white">Cloud Account & Sync</h3>
-      <p id="lblAuthSub" class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Sync your records across all devices safely with Supabase.</p>
-
-      <div id="authLoggedOutView" class="mt-4 space-y-3">
-        <button onclick="signInWithGoogle()" class="w-full py-2.5 rounded-xl border border-slate-200 dark:border-white/15 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 font-bold text-xs text-slate-700 dark:text-white flex items-center justify-center gap-2 transition active:scale-95">
-          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          <span id="lblAuthGoogle">Continue with Google</span>
-        </button>
-
-        <div class="flex items-center gap-2 my-2">
-          <div class="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
-          <span id="lblAuthOrEmail" class="text-[10px] text-slate-400 font-bold uppercase">or email</span>
-          <div class="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
+      <!-- Forgot Password View -->
+      <div id="authForgotPasswordBox" class="hidden">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 text-white font-extrabold flex items-center justify-center mb-3 shadow-lg shadow-amber-500/30">
+          <i data-lucide="key" class="w-6 h-6"></i>
         </div>
 
-        <div>
-          <label id="lblAuthNameInput" class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Full Name</label>
-          <input type="text" id="authNameInput" placeholder="Zeeshan Ali Khan" class="w-full bg-slate-50 dark:bg-[#08090d] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-purple-500">
-        </div>
+        <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Reset Password</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Enter your registered email address and we'll send a password recovery reset link.</p>
 
-        <div>
-          <label id="lblAuthEmailInput" class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email Address</label>
-          <input type="email" id="authEmailInput" placeholder="name@example.com" class="w-full bg-slate-50 dark:bg-[#08090d] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-purple-500">
-        </div>
+        <div class="mt-4 space-y-3">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Registered Email</label>
+            <input type="email" id="forgotEmailInput" placeholder="name@example.com" class="w-full bg-slate-50 dark:bg-[#08090d] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-purple-500">
+          </div>
 
-        <div>
-          <label id="lblAuthPassInput" class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Password</label>
-          <input type="password" id="authPasswordInput" placeholder="••••••••" class="w-full bg-slate-50 dark:bg-[#08090d] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-purple-500">
-        </div>
+          <button onclick="sendPasswordResetLink()" class="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-md shadow-purple-600/30 transition active:scale-95">
+            Send Recovery Email
+          </button>
 
-        <div class="grid grid-cols-2 gap-2 pt-1">
-          <button onclick="signInEmail()" id="btnAuthLogin" class="py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-md shadow-purple-600/30 transition active:scale-95">Log In</button>
-          <button onclick="signUpEmail()" id="btnAuthSignup" class="py-2.5 rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 font-extrabold text-xs transition active:scale-95">Sign Up</button>
+          <button onclick="toggleForgotPasswordView(false)" class="w-full py-2 text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">
+            ← Back to Login
+          </button>
         </div>
       </div>
 
-      <div id="authLoggedInView" class="hidden mt-4 space-y-4">
-        <div class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
-          <span id="lblAccountConnected" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase block">Account Connected</span>
-          <span id="activeUserEmailText" class="text-xs font-extrabold text-emerald-950 dark:text-emerald-200 font-mono break-all"></span>
-        </div>
-        <button onclick="syncDataToCloudNow()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-          <span id="lblSyncCloudBtn">Sync Now to Cloud</span>
-        </button>
-        <button onclick="signOutUser()" id="btnSignOutAuth" class="w-full py-2 bg-slate-100 dark:bg-white/10 text-rose-500 font-bold text-xs rounded-xl transition">
-          Sign Out / Go Offline
-        </button>
-      </div>
-
-      <div class="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 text-center">
-        <span id="lblAuthEncrypted" class="text-[10px] text-slate-400 leading-tight block">100% End-to-End Encrypted. Supabase Protected.</span>
-      </div>
     </div>
   </div>
 
@@ -1019,29 +1184,37 @@
   <div id="demoModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-sm app-card rounded-3xl p-6 relative shadow-2xl">
       <button onclick="closeDemoModal()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-xs text-slate-400">✕</button>
-      <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 text-white font-black text-xl flex items-center justify-center mb-3 shadow-lg shadow-purple-600/30">Z</div>
-      <h2 id="lblDemoHeader" class="text-base font-extrabold text-slate-900 dark:text-white">How Expense Tracker Works</h2>
-      <p id="lblDemoSub" class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Yeh app aapko month ke end tak overspending se bachati hai.</p>
+      <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 text-white font-black text-xl flex items-center justify-center mb-3 shadow-lg shadow-purple-600/30">
+        <i data-lucide="book-marked" class="w-5 h-5 text-white"></i>
+      </div>
+      
+      <h2 id="lblDemoHeader" class="text-base font-extrabold text-slate-900 dark:text-white">Welcome to Expense Tracker</h2>
+      <div id="lblDemoSub" class="text-xs text-slate-600 dark:text-slate-400 mt-2 space-y-1.5 leading-relaxed">
+        <p>• <strong>Smart Daily Budgeting:</strong> Automatically tracks safe daily spending to prevent end-of-month budget shocks.</p>
+        <p>• <strong>Multi-Book Ledgers:</strong> Manage personal, household, and business accounts cleanly in separate folders.</p>
+        <p>• <strong>Instant Conversion:</strong> Flip your balance card anytime for real-time foreign currency valuation.</p>
+      </div>
+
       <div class="mt-6 space-y-2">
         <button onclick="injectZeeshanDemoRecords()" id="btnLoadDemo" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-purple-600/30">
           <i data-lucide="database" class="w-3.5 h-3.5"></i>
-          LOAD DEMO DATA (WITH ZEESHAN)
+          <span>LOAD SAMPLE TEST DATA</span>
         </button>
         <button onclick="dismissAndZeroDemo()" id="btnGotItDismiss" class="w-full py-2.5 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl">
-          Got It, Let's Start
+          Got It, Start Fresh
         </button>
       </div>
     </div>
   </div>
 
-  <!-- DRAWER: KHARCHABOOKS -->
+  <!-- DRAWER: KHARCHABOOKS (WITH DELETE BUTTON FOR CUSTOM BOOKS) -->
   <div id="booksDrawer" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex justify-start">
     <div class="w-4/5 max-w-xs mcb-drawer-gradient h-full p-5 flex flex-col justify-between text-white">
       <div>
         <div class="flex justify-between items-center pb-4 border-b border-white/10">
           <div class="flex items-center gap-2">
             <div class="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs font-black shadow-md">ET</div>
-            <h3 class="text-xs font-extrabold tracking-wider uppercase text-purple-200">KharchaBooks Folder</h3>
+            <h3 id="drawerHeaderTitle" class="text-xs font-extrabold tracking-wider uppercase text-purple-200">KharchaBooks Folder</h3>
           </div>
           <button onclick="closeBooksDrawer()" class="text-xs text-slate-400 hover:text-white p-1">✕</button>
         </div>
@@ -1053,7 +1226,7 @@
           </button>
         </div>
       </div>
-      <div class="pt-4 border-t border-white/10 text-[10px] text-slate-400 text-center font-bold">
+      <div id="drawerFooterText" class="pt-4 border-t border-white/10 text-[10px] text-slate-400 text-center font-bold">
         Expense Tracker • Native Multi-Book
       </div>
     </div>
@@ -1063,8 +1236,19 @@
   <div id="wipeDateModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-sm app-card rounded-3xl p-6 relative max-h-[85vh] flex flex-col shadow-2xl">
       <button onclick="closeWipeDateModal()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-xs text-slate-400 hover:text-slate-800 dark:hover:text-white">✕</button>
+      
       <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Delete Records by Date</h3>
+      <p class="text-xs text-slate-400 mt-0.5">Select a specific date or choose from recorded history below.</p>
+
+      <div class="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center gap-2">
+        <input type="date" id="customWipeDatePicker" class="flex-1 bg-transparent text-xs font-bold text-slate-800 dark:text-white focus:outline-none">
+        <button onclick="wipeSelectedCustomDate()" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-extrabold hover:bg-rose-700 active:scale-95 transition">
+          Delete Date
+        </button>
+      </div>
+
       <div class="mt-3 flex-1 overflow-y-auto no-scrollbar space-y-2" id="wipeDateListContainer"></div>
+      
       <div class="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 shrink-0">
         <button onclick="confirmWipeAllRecords()" id="btnWipeEntireBook" class="w-full py-2.5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200/80 dark:border-rose-500/20 text-rose-600 dark:text-rose-400 font-extrabold text-xs rounded-xl hover:bg-rose-100 transition">
           Delete ALL Dates in this Book
@@ -1072,9 +1256,8 @@
       </div>
     </div>
   </div>
-<!-- JAVASCRIPT ENGINE -->
+  <!-- ==================== 3. JAVASCRIPT ENGINE ==================== -->
   <script>
-    // 1. Service Worker Registration (PWA Offline Capability)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -1107,7 +1290,6 @@
       }
     }, { passive: true });
 
-    // 2. PWA INSTALL PROMPT & NOTIFICATION LOGIC
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -1116,11 +1298,8 @@
 
     window.addEventListener('appinstalled', () => {
       localStorage.setItem('EXPENSE_TRACKER_PWA_INSTALLED', 'true');
-      localStorage.setItem('EXPENSE_TRACKER_HAS_ENTERED_APP', 'true');
       showToast("App installed successfully! 🎉");
-      setTimeout(() => {
-        showAppWorkspace();
-      }, 1400);
+      setTimeout(() => { showAppWorkspace(); }, 1400);
     });
 
     async function triggerInstallAction() {
@@ -1128,28 +1307,15 @@
       const textSpan = document.getElementById('landingInstallBtnText');
       const originalText = textSpan ? textSpan.textContent : "Download & Install App";
 
-      if (btn) {
-        btn.disabled = true;
-        if (textSpan) {
-          textSpan.innerHTML = `<span class="inline-flex items-center gap-2">
-            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-            </svg> Loading...
-          </span>`;
-        }
-      }
+      if (btn) btn.disabled = true;
 
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
           localStorage.setItem('EXPENSE_TRACKER_PWA_INSTALLED', 'true');
-          localStorage.setItem('EXPENSE_TRACKER_HAS_ENTERED_APP', 'true');
           showToast("App installed successfully! 🎉");
-          setTimeout(() => {
-            showAppWorkspace();
-          }, 1200);
+          setTimeout(() => { showAppWorkspace(); }, 1200);
         } else {
           showAppWorkspace();
         }
@@ -1165,7 +1331,6 @@
             if (textSpan) textSpan.textContent = originalText;
           }
           const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-          localStorage.setItem('EXPENSE_TRACKER_HAS_ENTERED_APP', 'true');
           if (isIOS) {
             showAppWorkspace();
             alert("To add to iPhone Home Screen:\n1. Tap the Share icon below\n2. Select 'Add to Home Screen' 📲");
@@ -1177,18 +1342,14 @@
       }
     }
 
-    // 3. LAUNCH APP WORKSPACE & PERSISTENCE
     function showAppWorkspace() {
-      localStorage.setItem('EXPENSE_TRACKER_HAS_ENTERED_APP', 'true');
       const landing = document.getElementById('landingShowcaseSection');
-      const details = document.getElementById('landingDetailsSection');
       const app = document.getElementById('mainAppSection');
       
-      if (landing) landing.classList.add('hidden');
-      if (details) details.classList.add('hidden');
+      if (landing) landing.style.display = 'none';
       if (app) {
         app.classList.remove('hidden');
-        app.style.setProperty('display', 'flex', 'important');
+        app.style.display = 'flex';
       }
       
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -1197,34 +1358,13 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // 4. CHECK RECENT APPS / STANDALONE MODE (PREVENTS LANDING PAGE LOOP)
     function verifyAppModePersistence() {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                            window.navigator.standalone === true || 
                            document.referrer.includes('android-app://');
-      const hasEnteredBefore = localStorage.getItem('EXPENSE_TRACKER_HAS_ENTERED_APP') === 'true';
-      const isPwaInstalled = localStorage.getItem('EXPENSE_TRACKER_PWA_INSTALLED') === 'true';
 
-      if (isStandalone || isPwaInstalled || hasEnteredBefore) {
+      if (isStandalone) {
         showAppWorkspace();
-      }
-    }
-
-    function togglePreviewTab(mode) {
-      const d = document.getElementById('desktopPreviewCard');
-      const m = document.getElementById('mobilePreviewCard');
-      const tD = document.getElementById('tabDesktop');
-      const tM = document.getElementById('tabMobile');
-      if (mode === 'desktop') {
-        if (d) d.classList.remove('hidden');
-        if (m) m.classList.add('hidden');
-        if (tD) tD.className = "px-6 py-2 rounded-xl font-black text-xs transition bg-purple-600 text-white shadow-md flex items-center gap-2";
-        if (tM) tM.className = "px-6 py-2 rounded-xl font-bold text-xs transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-2";
-      } else {
-        if (d) d.classList.add('hidden');
-        if (m) m.classList.remove('hidden');
-        if (tM) tM.className = "px-6 py-2 rounded-xl font-black text-xs transition bg-purple-600 text-white shadow-md flex items-center gap-2";
-        if (tD) tD.className = "px-6 py-2 rounded-xl font-bold text-xs transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-2";
       }
     }
 
@@ -1242,6 +1382,7 @@
 
     const SUPABASE_PROJECT_URL = 'https://hzcvjikuevxmiyrgdiec.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4FcXzpJ4sMPhO4yN7HtFHA_m0t7_tCI';
+    const GEMINI_API_KEY = 'AQ.Ab8RN6J1oC3y00nWzsBkJVuqeAt6o7L9jIRIGCzWPdzJ3aYNWA';
     let supabaseClient = null;
     try {
       if (window.supabase) supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
@@ -1257,6 +1398,7 @@
     let isDemoLoaded = false;
     let attachedReceiptBase64 = null;
     let myChartInstance = null;
+    let myLineChartInstance = null;
     let isBalanceHidden = JSON.parse(localStorage.getItem(BALANCE_PRIVACY_KEY)) || false;
 
     let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
@@ -1314,8 +1456,12 @@
         saveAppSettings: "Save Settings", 
         logKharcha: "Log Expense", 
         noTransactions: "No transactions recorded yet", 
-        noTransactionsSub: "Tap (+) below or click Demo above", 
-        noExpensesMonth: "No expenses recorded this month yet."
+        noTransactionsSub: "Tap (+) below to add your first expense", 
+        noExpensesMonth: "No expenses recorded this month yet.",
+        drawerTitle: "KharchaBooks Folder",
+        drawerNewBookPlaceholder: "New Book (e.g. Office Expense)",
+        drawerCreateBookBtn: "+ Create New Book",
+        drawerFooter: "Expense Tracker • Native Multi-Book"
       },
       ur: { 
         totalMonthlySpending: "کل ماہانہ اخراجات", 
@@ -1349,12 +1495,15 @@
         saveAppSettings: "ترتیبات محفوظ کریں", 
         logKharcha: "خرچ درج کریں", 
         noTransactions: "کوئی ریکارڈ موجود نہیں ہے", 
-        noTransactionsSub: "نیچے (+) بٹن یا اوپر ڈیمو دبائیں", 
-        noExpensesMonth: "اس ماہ ابھی تک کوئی خرچ درج نہیں ہوا۔"
+        noTransactionsSub: "نیچے (+) بٹن دبا کر نیا ریکارڈ درج کریں", 
+        noExpensesMonth: "اس ماہ ابھی تک کوئی خرچ درج نہیں ہوا۔",
+        drawerTitle: "خرچہ بکس فولڈر",
+        drawerNewBookPlaceholder: "نئی کتاب کا نام (مثلاً دکان کا کھاتہ)",
+        drawerCreateBookBtn: "+ نیا کھاتہ بنائیں",
+        drawerFooter: "ایکسپینس ٹریکر • ملٹی بک کھاتہ"
       }
     };
 
-    // 3D CARD FLIP MECHANISM (SMOOTH & CRYSTAL CLEAR HD)
     function flipCurrencyCard(shouldFlip) {
       const card = document.getElementById('mcbFlipCard');
       if (!card) return;
@@ -1376,14 +1525,7 @@
       });
       const balancePKR = Math.max(0, totalIn - totalOut);
 
-      const rates = {
-        usd: 0.0036,
-        aed: 0.013,
-        sar: 0.0135,
-        eur: 0.0033,
-        gbp: 0.0028
-      };
-
+      const rates = { usd: 0.0036, aed: 0.013, sar: 0.0135, eur: 0.0033, gbp: 0.0028 };
       const setVal = (id, prefix, rate) => {
         const el = document.getElementById(id);
         if (el) el.textContent = `${prefix}${(balancePKR * rate).toFixed(2)}`;
@@ -1394,6 +1536,19 @@
       setVal('convSar', '', rates.sar);
       setVal('convEur', '€', rates.eur);
       setVal('convGbp', '£', rates.gbp);
+    }
+
+    function flipChartCard(shouldFlip) {
+      const card = document.getElementById('chartFlipCard');
+      if (!card) return;
+      if (shouldFlip) {
+        card.classList.add('flipped');
+        renderTrendingLineChart();
+      } else {
+        card.classList.remove('flipped');
+        renderChart();
+      }
+      if (window.lucide) lucide.createIcons();
     }
 
     function switchTab(tabId) {
@@ -1418,15 +1573,15 @@
       Object.keys(dockMap).forEach(key => {
         const label = document.getElementById(dockMap[key]);
         if (label) {
-          if (key === tabId) {
-            label.className = "text-[10px] font-bold text-purple-600 dark:text-purple-400";
-          } else {
-            label.className = "text-[10px] font-bold text-slate-500 dark:text-slate-400";
-          }
+          label.className = (key === tabId) 
+            ? "text-[10px] font-bold text-purple-600 dark:text-purple-400" 
+            : "text-[10px] font-bold text-slate-500 dark:text-slate-400";
         }
       });
 
-      if (tabId === 'dashboard') renderChart();
+      if (tabId === 'dashboard') {
+        renderChart();
+      }
       if (tabId === 'calendar') renderCalendar();
       if (tabId === 'transactions') renderFullLedger();
       if (tabId === 'settings') {
@@ -1451,13 +1606,22 @@
       }
       const clearBtn = document.getElementById('btnClearReceipt');
       if (clearBtn) clearBtn.classList.add('hidden');
+      const statusTxt = document.getElementById('ocrStatusText');
+      if (statusTxt) statusTxt.textContent = settings.language === 'ur' ? "بل اسکین کریں" : "Scan Bill / Auto-Fill Items";
     }
 
-    function handleReceiptUpload(e) {
+    // ADVANCED MULTI-ITEM OCR SCANNER WITH STORE NAME DETECTION & BILINGUAL NOTIFICATIONS
+    async function handleSmartReceiptScan(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
+
+      const isUrdu = settings.language === 'ur';
+      const statusTxt = document.getElementById('ocrStatusText');
+      if (statusTxt) statusTxt.textContent = isUrdu ? "آپ کا بل اسکین ہو رہا ہے... ⏳" : "Scanning your bill... ⏳";
+      showToast(isUrdu ? "بل شامل کیا جا رہا ہے... ⏳" : "Scanning and adding your bill... ⏳");
+
       const reader = new FileReader();
-      reader.onload = function(evt) {
+      reader.onload = async function(evt) {
         attachedReceiptBase64 = evt.target.result;
         const prev = document.getElementById('receiptPreviewImg');
         const cBtn = document.getElementById('btnClearReceipt');
@@ -1466,10 +1630,53 @@
           prev.classList.remove('hidden');
         }
         if (cBtn) cBtn.classList.remove('hidden');
+
+        try {
+      if (statusTxt) statusTxt.textContent = isUrdu ? "✨ AI اسکین کر رہا ہے..." : "✨ AI Scanning...";
+      showToast(isUrdu ? "AI بل اسکین کر رہا ہے..." : "Gemini AI reading receipt...");
+
+      const rawBase64 = attachedReceiptBase64.split(',')[1];
+      const mimeType = attachedReceiptBase64.split(';')[0].split(':')[1] || 'image/jpeg';
+
+      const prompt = `Analyze this receipt image. Extract store name, total final bill amount, and category.
+Return ONLY valid JSON matching this exact structure:
+{"storeName": "Name of shop or main item", "totalAmount": 0, "category": "Food"}
+Categories allowed: Food, Fuel, Bills, Transport, Shopping, Other.
+Do not wrap with markdown or code blocks. Pure JSON only.`;
+
+      const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inline_data: { mime_type: mimeType, data: rawBase64 } }
+            ]
+          }]
+        })
+      });
+
+      const aiData = await aiResponse.json();
+      const rawText = aiData.candidates[0].content.parts[0].text;
+      const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
+
+      const amtEl = document.getElementById('modalAmountInput');
+      const ttlEl = document.getElementById('modalTitleInput');
+
+      if (amtEl && parsed.totalAmount) amtEl.value = parsed.totalAmount;
+      if (ttlEl && parsed.storeName) ttlEl.value = parsed.storeName;
+
+      if (statusTxt) statusTxt.textContent = isUrdu ? "مکمل ہو گیا!" : "Scan Complete!";
+      showToast(isUrdu ? "بل کامیابی سے درج ہو گیا!" : `Scanned: ${parsed.storeName || 'Bill'} - Rs ${parsed.totalAmount || 0}`);
+    } catch (err) {
+      console.error("AI Scan Error:", err);
+      if (statusTxt) statusTxt.textContent = isUrdu ? "دستی درج کریں" : "Manual Entry";
+      showToast(isUrdu ? "اسکین میں مسئلہ آیا، خود درج کریں۔" : "Could not scan cleanly, please enter manually.");
+    }
       };
       reader.readAsDataURL(file);
     }
-
     function openAddModal() {
       const amt = document.getElementById('modalAmountInput');
       const ttl = document.getElementById('modalTitleInput');
@@ -1483,18 +1690,212 @@
       setModalType('expense');
       selectCategory('Food/Drink', '🍔');
       const m = document.getElementById('addModal');
-      if (m) m.classList.remove('hidden');
+      if (m) {
+        m.classList.remove('hidden');
+        m.style.setProperty('display', 'flex', 'important');
+      }
       if (window.lucide) lucide.createIcons();
     }
-    function closeAddModal() { const m = document.getElementById('addModal'); if (m) m.classList.add('hidden'); }
-    function openDemoModal() { const m = document.getElementById('demoModal'); if (m) m.classList.remove('hidden'); }
-    function closeDemoModal() { const m = document.getElementById('demoModal'); if (m) m.classList.add('hidden'); }
-    function openAuthModal() { const m = document.getElementById('authModal'); if (m) m.classList.remove('hidden'); }
-    function closeAuthModal() { const m = document.getElementById('authModal'); if (m) m.classList.add('hidden'); }
-    function openBooksDrawer() { renderBooksDrawer(); const m = document.getElementById('booksDrawer'); if (m) m.classList.remove('hidden'); }
-    function closeBooksDrawer() { const m = document.getElementById('booksDrawer'); if (m) m.classList.add('hidden'); }
-    function openWipeDateModal() { renderWipeDateModal(); const m = document.getElementById('wipeDateModal'); if (m) m.classList.remove('hidden'); }
-    function closeWipeDateModal() { const m = document.getElementById('wipeDateModal'); if (m) m.classList.add('hidden'); }
+ // --- GEMINI AI VOICE TO TRANSACTION ---
+function startVoiceExpense() {
+  const voiceBtn = document.getElementById('voiceBtnText');
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    if (typeof showToast === 'function') {
+      showToast("Voice input is not supported in this browser. Use Chrome or Edge.");
+    } else {
+      alert("Voice input is not supported in this browser. Use Chrome or Edge.");
+    }
+    return;
+  }
+
+  try {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ur-PK';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    if (voiceBtn) voiceBtn.textContent = "Listening... Speak now";
+    if (typeof showToast === 'function') showToast("Listening... Speak your expense (e.g. 500 petrol)");
+
+    recognition.onstart = () => {
+      console.log("Mic recording started");
+    };
+
+    recognition.onresult = async (event) => {
+      const spokenText = event.results[0][0].transcript;
+      if (voiceBtn) voiceBtn.textContent = "Processing with AI...";
+      if (typeof showToast === 'function') showToast(`Heard: "${spokenText}"`);
+
+      const prompt = `Extract expense details from this input: "${spokenText}".
+Return ONLY pure JSON matching this schema:
+{"storeName": "Brief item or merchant name", "totalAmount": 0, "category": "Food"}
+Categories allowed: Food, Groceries, Fuel, Transport, Bills, Shopping, Health, Other.
+Do NOT use markdown or backticks. Return raw JSON only.`;
+
+      try {
+        const key = (typeof GEMINI_API_KEY !== 'undefined') ? GEMINI_API_KEY : localStorage.getItem('USER_GEMINI_KEY');
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+
+        const data = await res.json();
+        const rawText = data.candidates[0].content.parts[0].text;
+        const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
+
+        const amtEl = document.getElementById('modalAmountInput');
+        const ttlEl = document.getElementById('modalTitleInput');
+
+        if (amtEl && parsed.totalAmount) amtEl.value = parsed.totalAmount;
+        if (ttlEl && parsed.storeName) ttlEl.value = parsed.storeName;
+
+        if (typeof showToast === 'function') {
+          showToast(`Added: ${parsed.storeName} - Rs. ${parsed.totalAmount}`);
+        }
+      } catch (err) {
+        console.error("Gemini Error:", err);
+        if (typeof showToast === 'function') showToast("AI could not extract details. Enter manually.");
+      } finally {
+        if (voiceBtn) voiceBtn.textContent = "Add with Voice";
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech Error:", event.error);
+      if (voiceBtn) voiceBtn.textContent = "Add with Voice";
+      alert("Mic permission error: " + event.error + ". Browser settings mein Microphone allow karein.");
+    };
+
+    recognition.onend = () => {
+      if (voiceBtn && voiceBtn.textContent === "Listening... Speak now") {
+        voiceBtn.textContent = "Add with Voice";
+      }
+    };
+
+    recognition.start();
+  } catch (e) {
+    console.error("Recognition start error:", e);
+    if (voiceBtn) voiceBtn.textContent = "Add with Voice";
+  }
+}
+    function closeAddModal() { 
+      const m = document.getElementById('addModal'); 
+      if (m) {
+        m.classList.add('hidden');
+        m.style.setProperty('display', 'none', 'important');
+      } 
+    }
+    
+    function openDemoModal() { 
+      const m = document.getElementById('demoModal'); 
+      if (m) {
+        m.classList.remove('hidden');
+        m.style.setProperty('display', 'flex', 'important');
+      }
+      if (window.lucide) lucide.createIcons(); 
+    }
+    function closeDemoModal() { 
+      const m = document.getElementById('demoModal'); 
+      if (m) {
+        m.classList.add('hidden');
+        m.style.setProperty('display', 'none', 'important');
+      }
+    }
+    
+    function openAuthModal() { 
+      toggleForgotPasswordView(false);
+      const m = document.getElementById('authModal'); 
+      if (m) {
+        m.classList.remove('hidden');
+        m.style.setProperty('display', 'flex', 'important');
+      }
+      if (window.lucide) lucide.createIcons(); 
+    }
+    function closeAuthModal() { 
+      const m = document.getElementById('authModal'); 
+      if (m) {
+        m.classList.add('hidden');
+        m.style.setProperty('display', 'none', 'important');
+      }
+    }
+    
+    function openBooksDrawer() { 
+      renderBooksDrawer(); 
+      const m = document.getElementById('booksDrawer'); 
+      if (m) {
+        m.classList.remove('hidden');
+        m.style.setProperty('display', 'flex', 'important');
+      }
+      if (window.lucide) lucide.createIcons(); 
+    }
+    function closeBooksDrawer() { 
+      const m = document.getElementById('booksDrawer'); 
+      if (m) {
+        m.classList.add('hidden');
+        m.style.setProperty('display', 'none', 'important');
+      }
+    }
+    
+    function openWipeDateModal() { 
+      const picker = document.getElementById('customWipeDatePicker');
+      if (picker) picker.value = new Date().toISOString().split('T')[0];
+      renderWipeDateModal(); 
+      const m = document.getElementById('wipeDateModal'); 
+      if (m) {
+        m.classList.remove('hidden');
+        m.style.setProperty('display', 'flex', 'important');
+      }
+      if (window.lucide) lucide.createIcons(); 
+    }
+    function closeWipeDateModal() { 
+      const m = document.getElementById('wipeDateModal'); 
+      if (m) {
+        m.classList.add('hidden');
+        m.style.setProperty('display', 'none', 'important');
+      }
+    }
+
+    function toggleForgotPasswordView(showForgot) {
+      const stdBox = document.getElementById('authFormStandardBox');
+      const forgotBox = document.getElementById('authForgotPasswordBox');
+      if (showForgot) {
+        if (stdBox) stdBox.classList.add('hidden');
+        if (forgotBox) forgotBox.classList.remove('hidden');
+      } else {
+        if (stdBox) stdBox.classList.remove('hidden');
+        if (forgotBox) forgotBox.classList.add('hidden');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function sendPasswordResetLink() {
+      const email = document.getElementById('forgotEmailInput')?.value.trim();
+      if (!email) {
+        showToast("Please enter your registered email");
+        return;
+      }
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin
+          });
+          if (error) {
+            showToast(error.message);
+          } else {
+            showToast("Password reset link sent! Check your inbox.");
+            toggleForgotPasswordView(false);
+          }
+        } catch (e) {
+          showToast("Failed to send reset link.");
+        }
+      } else {
+        showToast("Reset link sent! (Offline simulation)");
+        toggleForgotPasswordView(false);
+      }
+    }
 
     function setModalType(type) {
       modalSelectedType = type;
@@ -1532,11 +1933,9 @@
       modalCategoryIcon = icon;
       document.querySelectorAll('.cat-btn').forEach(btn => {
         const c = btn.getAttribute('data-category');
-        if (c === catName) {
-          btn.className = "cat-btn p-2 rounded-2xl bg-purple-50 border-2 border-purple-500 text-purple-700 dark:bg-purple-500/20 dark:border-purple-500 dark:text-purple-300 flex flex-col items-center gap-1 transition active:scale-95";
-        } else {
-          btn.className = "cat-btn p-2 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/5 flex flex-col items-center gap-1 transition active:scale-95";
-        }
+        btn.className = (c === catName)
+          ? "cat-btn p-2 rounded-2xl bg-purple-50 border-2 border-purple-500 text-purple-700 dark:bg-purple-500/20 dark:border-purple-500 dark:text-purple-300 flex flex-col items-center gap-1 transition active:scale-95"
+          : "cat-btn p-2 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/5 flex flex-col items-center gap-1 transition active:scale-95";
       });
       const customBox = document.getElementById('customOtherBox');
       if (catName === 'Other') {
@@ -1602,17 +2001,19 @@
       const todayFormatted = new Date().toLocaleDateString('en-PK', { month: 'short', day: 'numeric', year: 'numeric' });
 
       currentBook.transactions = [
-        { id: 101, title: 'Freelance Web Payout from Zeeshan', amount: 85000, type: 'income', category: 'Income', icon: '💰', receipt: null, date: todayFormatted, rawDate: todayStr, time: '11:00 AM' },
-        { id: 102, title: 'Dinner with Zeeshan at Beverly Center', amount: 4200, type: 'expense', category: 'Food/Drink', icon: '🍔', receipt: null, date: todayFormatted, rawDate: todayStr, time: '08:30 PM' },
-        { id: 103, title: 'Lunch with Zeeshan Ali Khan', amount: 1450, type: 'expense', category: 'Food/Drink', icon: '🍔', receipt: null, date: todayFormatted, rawDate: todayStr, time: '01:45 PM' },
-        { id: 104, title: 'PSO Super Fuel Topup', amount: 3000, type: 'expense', category: 'Fuel', icon: '⛽', receipt: null, date: todayFormatted, rawDate: todayStr, time: '04:15 PM' },
-        { id: 105, title: 'Al-Fateh Grocery Restock', amount: 6200, type: 'expense', category: 'Groceries', icon: '🛒', receipt: null, date: todayFormatted, rawDate: todayStr, time: '06:00 PM' }
+        { id: 101, title: 'Freelance Payout From Zeeshan', amount: 85000, type: 'income', category: 'Income', icon: '💰', receipt: null, date: todayFormatted, rawDate: todayStr, time: '11:00 AM' },
+        { id: 102, title: 'Dinner With Zeeshi at Beverly Center', amount: 4200, type: 'expense', category: 'Food/Drink', icon: '🍔', receipt: null, date: todayFormatted, rawDate: todayStr, time: '08:30 PM' },
+        { id: 103, title: 'Specialty Coffee & Workspace', amount: 1450, type: 'expense', category: 'Food/Drink', icon: '🍔', receipt: null, date: todayFormatted, rawDate: todayStr, time: '01:45 PM' },
+        { id: 104, title: 'Fuel Topup & Carwash', amount: 3000, type: 'expense', category: 'Fuel', icon: '⛽', receipt: null, date: todayFormatted, rawDate: todayStr, time: '04:15 PM' },
+        { id: 105, title: 'Grocery Superstore Restock', amount: 6200, type: 'expense', category: 'Groceries', icon: '🛒', receipt: null, date: todayFormatted, rawDate: todayStr, time: '06:00 PM' }
       ];
 
       isDemoLoaded = true;
       closeDemoModal();
       persist();
-      showToast("Demo loaded successfully!");
+      showAppWorkspace();
+      switchTab('dashboard');
+      showToast("Sample demo data loaded! Live dashboard updated.");
     }
 
     function dismissAndZeroDemo() {
@@ -1623,6 +2024,7 @@
         persist();
       }
       closeDemoModal();
+      switchTab('dashboard');
     }
 
     function getActiveBook() {
@@ -1794,11 +2196,9 @@
     function filterTxCategory(cat) {
       currentFilterCat = cat;
       document.querySelectorAll('.cat-pill').forEach(btn => {
-        if (btn.getAttribute('data-cat') === cat) {
-          btn.className = "cat-pill active px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-600 text-white shrink-0 transition";
-        } else {
-          btn.className = "cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition";
-        }
+        btn.className = (btn.getAttribute('data-cat') === cat)
+          ? "cat-pill active px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-600 text-white shrink-0 transition"
+          : "cat-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 shrink-0 transition";
       });
       renderFullLedger();
     }
@@ -1814,7 +2214,7 @@
       let list = currentBook.transactions;
 
       if (currentFilterCat !== 'all') {
-        list = list.filter(t => t.category.toLowerCase().includes(currentFilterCat.toLowerCase()));
+        list = list.filter(t => (t.category || '').toLowerCase() === currentFilterCat.toLowerCase());
       }
 
       if (query !== '') {
@@ -1836,13 +2236,18 @@
       if (window.lucide) lucide.createIcons();
     }
 
+    // DRAWER RENDERING (LOCKED DEFAULT BOOKS + DELETE TRASH ICON FOR CUSTOM BOOKS)
     function renderBooksDrawer() {
       const list = document.getElementById('booksListContainer');
       if (!list) return;
       list.innerHTML = '';
 
+      const lockedIds = ['book-1', 'book-2', 'book-3'];
+
       state.books.forEach(b => {
         const isActive = b.id === state.activeBookId;
+        const isLocked = lockedIds.includes(b.id);
+
         const div = document.createElement('div');
         div.className = `p-3.5 rounded-2xl flex items-center justify-between cursor-pointer border transition ${
           isActive 
@@ -1860,15 +2265,36 @@
           .reduce((sum, t) => sum + t.amount, 0);
 
         div.innerHTML = `
-          <div class="flex items-center gap-2.5">
-            <i data-lucide="book" class="w-4 h-4 text-purple-400"></i>
-            <span class="text-xs font-bold">${b.name}</span>
+          <div class="flex items-center gap-2.5 truncate">
+            <i data-lucide="${isLocked ? 'book' : 'folder'}" class="w-4 h-4 text-purple-400 shrink-0"></i>
+            <span class="text-xs font-bold truncate">${b.name}</span>
           </div>
-          <span class="text-[10px] font-mono font-bold text-slate-300">${settings.currency || 'Rs.'} ${totalSpent.toLocaleString()}</span>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-[10px] font-mono font-bold text-slate-300">${settings.currency || 'Rs.'} ${totalSpent.toLocaleString()}</span>
+            ${!isLocked ? `
+              <button onclick="event.stopPropagation(); deleteCustomBook('${b.id}')" class="p-1 rounded-lg hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Delete Book">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            ` : ''}
+          </div>
         `;
         list.appendChild(div);
       });
       if (window.lucide) lucide.createIcons();
+    }
+
+    function deleteCustomBook(bookId) {
+      const target = state.books.find(b => b.id === bookId);
+      if (!target) return;
+      if (confirm(`Are you sure you want to delete "${target.name}" and all its records?`)) {
+        state.books = state.books.filter(b => b.id !== bookId);
+        if (state.activeBookId === bookId) {
+          state.activeBookId = 'book-1';
+        }
+        persist();
+        renderBooksDrawer();
+        showToast("Book deleted successfully!");
+      }
     }
 
     function createNewBook() {
@@ -1920,13 +2346,28 @@
       if (window.lucide) lucide.createIcons();
     }
 
+    function wipeSelectedCustomDate() {
+      const picker = document.getElementById('customWipeDatePicker');
+      const targetDate = picker ? picker.value : null;
+      if (!targetDate) {
+        showToast("Please choose a date to wipe.");
+        return;
+      }
+      confirmWipeDate(targetDate);
+    }
+
     function confirmWipeDate(targetDate) {
       if (confirm(`Are you sure you want to delete all records for ${targetDate}?`)) {
         const currentBook = getActiveBook();
+        const initialCount = currentBook.transactions.length;
         currentBook.transactions = currentBook.transactions.filter(t => t.rawDate !== targetDate);
-        persist();
-        closeWipeDateModal();
-        showToast("Records deleted for " + targetDate);
+        if (currentBook.transactions.length === initialCount) {
+          showToast(`No records found for ${targetDate}`);
+        } else {
+          persist();
+          closeWipeDateModal();
+          showToast("Records wiped for " + targetDate);
+        }
       }
     }
 
@@ -1938,6 +2379,54 @@
         closeWipeDateModal();
         showToast("All records cleared in this book.");
       }
+    }
+
+    // AI ADVISOR LOGIC
+    function updateAIAdvisor(catTotals, totalOut) {
+      const advBox = document.getElementById('aiAdvisorMessage');
+      if (!advBox) return;
+      
+      const l = settings.language === 'ur' ? 'ur' : 'en';
+      const curr = settings.currency || 'Rs.';
+      
+      if (totalOut === 0) {
+        advBox.innerHTML = l === 'ur' 
+          ? "اس مہینے آپ نے کوئی خرچ نہیں کیا۔ بہترین شروعات! 🎉" 
+          : "Aapne is mahine koi kharcha nahi kiya. Great start! 🎉";
+        return;
+      }
+
+      let topCat = '';
+      let max = 0;
+      for (let c in catTotals) {
+        if (catTotals[c] > max) { max = catTotals[c]; topCat = c; }
+      }
+      
+      let pct = Math.round((max / totalOut) * 100);
+      let cap = parseFloat(settings.budgetCap) || 0;
+      
+      let msgText = l === 'ur' 
+        ? `آپ کا سب سے زیادہ خرچ <b>${topCat}</b> (${curr} ${max.toLocaleString()}) پر ہوا ہے، جو کل خرچ کا <b>${pct}%</b> ہے۔ `
+        : `Aapka sabse zyada kharcha <b>${topCat}</b> (${curr} ${max.toLocaleString()}) par hua hai, jo total ka <b>${pct}%</b> hai. `;
+
+      if (cap > 0) {
+        let budgetPct = Math.round((totalOut / cap) * 100);
+        if (budgetPct >= 100) {
+          msgText += l === 'ur' 
+            ? `<span class="text-rose-500 font-bold block mt-1">⚠️ الرٹ: آپ بجٹ کی حد پار کر چکے ہیں!</span>` 
+            : `<span class="text-rose-500 font-bold block mt-1">⚠️ Alert: Aap budget limit cross kar chuke hain!</span>`;
+        } else if (budgetPct >= 80) {
+          msgText += l === 'ur' 
+            ? `<span class="text-amber-500 font-bold block mt-1">⚡ وارننگ: آپ کا ${budgetPct}% بجٹ استعمال ہو چکا ہے، احتیاط کریں!</span>` 
+            : `<span class="text-amber-500 font-bold block mt-1">⚡ Warning: Aapka ${budgetPct}% budget lag chuka hai, hath rok lein!</span>`;
+        } else {
+          msgText += l === 'ur' 
+            ? `<span class="text-emerald-500 font-bold block mt-1">🌿 زبردست: آپ بالکل بجٹ کے اندر جا رہے ہیں!</span>` 
+            : `<span class="text-emerald-500 font-bold block mt-1">🌿 Great going: Aap bilkul safe budget ke andar hain!</span>`;
+        }
+      }
+      
+      advBox.innerHTML = msgText;
     }
 
     function render() {
@@ -1969,6 +2458,7 @@
       if (tExp) tExp.textContent = `-${curr} ${totalOut.toLocaleString()}`;
 
       renderBalanceDisplay();
+      updateAIAdvisor(catTotals, totalOut);
 
       const now = new Date();
       const totalDaysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -2122,6 +2612,72 @@
       });
     }
 
+    function renderTrendingLineChart() {
+      const ctx = document.getElementById('trendingLineChart');
+      if (!ctx || typeof Chart === 'undefined') return;
+
+      const currentBook = getActiveBook();
+      const dailyMap = {};
+
+      currentBook.transactions.forEach(t => {
+        if (t.type === 'expense' && t.rawDate) {
+          dailyMap[t.rawDate] = (dailyMap[t.rawDate] || 0) + t.amount;
+        }
+      });
+
+      const sortedDates = Object.keys(dailyMap).sort().slice(-7);
+      const labels = sortedDates.map(d => d.slice(5));
+      const dataPoints = sortedDates.map(d => dailyMap[d]);
+
+      if (myLineChartInstance) {
+        try { myLineChartInstance.destroy(); } catch(e) {}
+        myLineChartInstance = null;
+      }
+
+      const isDark = document.documentElement.classList.contains('dark');
+
+      myLineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels.length ? labels : ['No Data'],
+          datasets: [{
+            label: 'Daily Expense',
+            data: dataPoints.length ? dataPoints : [0],
+            borderColor: '#8B5CF6',
+            backgroundColor: 'rgba(139, 92, 246, 0.15)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 2.5,
+            pointBackgroundColor: '#8B5CF6',
+            pointRadius: 3.5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (item) => ` ${settings.currency || 'Rs.'} ${item.raw.toLocaleString()}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: isDark ? '#94a3b8' : '#64748b', font: { size: 9 } }
+            },
+            y: {
+              grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' },
+              ticks: { color: isDark ? '#94a3b8' : '#64748b', font: { size: 9 } }
+            }
+          }
+        }
+      });
+    }
+
     function changeCurrency(newCurr) {
       settings.currency = newCurr;
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -2164,26 +2720,30 @@
         if (iconM) iconM.setAttribute('data-lucide', 'sun');
         if (iconD) iconD.setAttribute('data-lucide', 'sun');
         if (iconLanding) iconLanding.setAttribute('data-lucide', 'sun');
-        if (meta) meta.setAttribute('content', '#08090d');
+        if (meta) meta.setAttribute('content', '#1e1b4b');
       } else {
         document.documentElement.classList.remove('dark');
         document.body.classList.remove('dark');
         if (iconM) iconM.setAttribute('data-lucide', 'moon');
         if (iconD) iconD.setAttribute('data-lucide', 'moon');
         if (iconLanding) iconLanding.setAttribute('data-lucide', 'moon');
-        if (meta) meta.setAttribute('content', '#1e1b4b');
+        if (meta) meta.setAttribute('content', '#ffffff');
       }
       if (window.lucide) lucide.createIcons();
       if (typeof renderChart === 'function') renderChart();
     }
 
-    function toggleTheme() {
-      const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-      settings.theme = newTheme;
-      localStorage.setItem('theme', newTheme);
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-      applyTheme(newTheme);
-    }
+   function toggleTheme() {
+  document.documentElement.classList.add('no-transitions');
+  const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+  settings.theme = newTheme;
+  localStorage.setItem('theme', newTheme);
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  applyTheme(newTheme);
+  requestAnimationFrame(() => {
+    document.documentElement.classList.remove('no-transitions');
+  });
+}
 
     function cycleLanguage() {
       settings.language = (settings.language === 'en') ? 'ur' : 'en';
@@ -2220,6 +2780,7 @@
       setTxt('lblCustomOther', l.customOther);
       setTxt('lblDetailNote', l.detailNote);
       setTxt('btnSaveRecord', l.saveRecord);
+      setTxt('lblAiAdvisorTitle', settings.language === 'ur' ? "اے آئی فنانشل ایڈوائزر" : "AI Financial Advisor");
 
       setTxt('lblAllTransactions', l.allTransactions);
       setTxt('lblSettingsTitle', l.settingsTitle);
@@ -2228,20 +2789,23 @@
       setTxt('lblSaveAppSettings', l.saveAppSettings);
       setTxt('lblLogKharchaBtn', l.logKharcha);
 
+      setTxt('drawerHeaderTitle', l.drawerTitle);
+      setTxt('btnCreateNewBook', l.drawerCreateBookBtn);
+      setTxt('drawerFooterText', l.drawerFooter);
+      const newBookInputEl = document.getElementById('newBookInput');
+      if (newBookInputEl) newBookInputEl.placeholder = l.drawerNewBookPlaceholder;
+
       const mainLbl = document.getElementById('langMainLabel');
-      const deskBtn = document.getElementById('langSwitchBtnDesktop');
       const calHeaderTitle = document.getElementById('calMobileHeaderTitle');
       const settingsHeaderTitle = document.getElementById('settingsMobileHeaderTitle');
 
       if (settings.language === 'en') {
         if (mainLbl) mainLbl.textContent = "English";
-        if (deskBtn) deskBtn.textContent = "English";
         if (calHeaderTitle) calHeaderTitle.textContent = "Monthly Calendar";
         if (settingsHeaderTitle) settingsHeaderTitle.textContent = "Settings";
         document.body.classList.remove('urdu-font');
       } else {
         if (mainLbl) mainLbl.textContent = "اردو";
-        if (deskBtn) deskBtn.textContent = "اردو";
         if (calHeaderTitle) calHeaderTitle.textContent = "ماہانہ کیلنڈر";
         if (settingsHeaderTitle) settingsHeaderTitle.textContent = "ترتیبات";
         document.body.classList.add('urdu-font');
@@ -2277,12 +2841,11 @@
       URL.revokeObjectURL(url);
     }
 
-    // 5. INVITE FRIENDS (NATIVE APP SHARE WITH TRUSTWORTHY MESSAGE)
     async function shareInviteLink() {
       const shareData = {
         title: 'Expense Tracker App',
         text: 'Manage your daily expenses, track your ledger and save your monthly budget with Expense Tracker!\nInstall and use the app here: ',
-        url: 'https://expense-app-live.vercel.app'
+        url: window.location.origin
       };
 
       if (navigator.share) {
@@ -2290,9 +2853,7 @@
           await navigator.share(shareData);
           showToast("Shared successfully! 🎉");
         } catch (err) {
-          if (err.name !== 'AbortError') {
-            copyInviteFallback(shareData);
-          }
+          if (err.name !== 'AbortError') copyInviteFallback(shareData);
         }
       } else {
         copyInviteFallback(shareData);
@@ -2352,7 +2913,33 @@
       }
     }
 
-    // 6. SUPABASE AUTH METHODS
+    async function updateTopBarUserName() {
+      const topNameEl = document.getElementById('topBarUserDisplayName');
+      if (!topNameEl) return;
+
+      if (currentUser) {
+        const fullNm = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name;
+        const emailFallback = currentUser.email ? currentUser.email.split('@')[0] : '';
+        topNameEl.textContent = fullNm || emailFallback;
+      } else if (supabaseClient) {
+        try {
+          const { data: { user } } = await supabaseClient.auth.getUser();
+          if (user) {
+            currentUser = user;
+            localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+            const fullNm = user.user_metadata?.full_name || user.user_metadata?.name;
+            const emailFallback = user.email ? user.email.split('@')[0] : '';
+            topNameEl.textContent = fullNm || emailFallback;
+            renderAuthUI();
+            return;
+          }
+        } catch(e) {}
+        topNameEl.textContent = "";
+      } else {
+        topNameEl.textContent = "";
+      }
+    }
+
     async function signInWithGoogle() {
       if (!supabaseClient) {
         showToast("Supabase not initialized.");
@@ -2361,9 +2948,7 @@
       try {
         const { error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
-          options: {
-            redirectTo: 'https://expense-app-live.vercel.app'
-          }
+          options: { redirectTo: window.location.origin }
         });
         if (error) showToast(error.message);
       } catch (e) {
@@ -2387,6 +2972,7 @@
         localStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
         closeAuthModal();
         renderAuthUI();
+        updateTopBarUserName();
         showToast("Logged in successfully! 🚀");
       }
     }
@@ -2418,6 +3004,7 @@
       currentUser = null;
       localStorage.removeItem(AUTH_KEY);
       renderAuthUI();
+      updateTopBarUserName();
       closeAuthModal();
       showToast("Signed out. Switched to offline mode.");
     }
@@ -2455,15 +3042,16 @@
         if (setDisplay) setDisplay.textContent = 'Offline Guest Mode';
         if (btnSetAuth) btnSetAuth.textContent = 'Connect Account';
       }
+      updateTopBarUserName();
     }
 
-    // 7. INITIALIZATION ON PAGE LOAD
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
       applyLanguage();
       renderProfileDp();
       verifyAppModePersistence();
       renderAuthUI();
+      updateTopBarUserName();
       if (window.lucide) lucide.createIcons();
     });
   </script>
