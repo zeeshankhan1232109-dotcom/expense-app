@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>EXPENSE TRACKER — Official Web & Mobile App</title>
+  <meta name="theme-color" content="#9333ea" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <!-- iPhone Dynamic Island / Notch Transparent Status Bar Coverage -->
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#1e1b4b" id="themeMeta">
   <link rel="manifest" href="manifest.json">
 
@@ -18,28 +18,27 @@
   <!-- Tailwind CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
- <script>
-  tailwind.config = {
-    darkMode: 'class',
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-          mono: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'sans-serif']
-        },
-        colors: {
-          brand: {
-            50: '#F5F3FF',
-            100: '#EDE9FE',
-            500: '#8B5CF6',
-            600: '#7C3AED',
-            700: '#6D28D9'
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50: '#F5F3FF',
+              100: '#EDE9FE',
+              500: '#8B5CF6',
+              600: '#7C3AED',
+              700: '#6D28D9'
+            }
           }
         }
       }
     }
-  }
-</script>
   </script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,25 +51,32 @@
   <!-- OCR Library for Bill Scanning -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
- <style>
-:root {
-  --sat: env(safe-area-inset-top, 0px);
-  --sab: env(safe-area-inset-bottom, 0px);
-}
+  <style>
+    :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+    }
 
-body {
-  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
+    body {
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      /* Fix 3: Light mode background off-white */
+      background-color: #F6F8FC; 
+    }
+    
+    body.dark {
+      background-color: #08090d;
+    }
 
-.mcb-curved-banner {
-  padding-top: max(1rem, env(safe-area-inset-top, 0px)) !important;
-}
+    .mcb-curved-banner {
+      /* Fix 2: Add extra padding top to avoid notch overlap in UI */
+      padding-top: max(1rem, env(safe-area-inset-top, 0px)) !important;
+    }
 
     .font-mono {
       font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif !important;
@@ -83,7 +89,6 @@ body {
       background: linear-gradient(145deg, #1e1b4b 0%, #2e1065 42%, #0f172a 100%) !important;
       border-bottom: 1px solid rgba(168, 85, 247, 0.25);
       box-shadow: 0 16px 36px -10px rgba(46, 16, 101, 0.55);
-      padding-top: calc(1rem + env(safe-area-inset-top, 0px)) !important;
     }
 
     /* GLASS CARD */
@@ -171,21 +176,23 @@ body {
   }
     .urdu-font { font-family: 'Noto Nastaliq Urdu', serif !important; }
   </style>
+  
   <!-- Light Mode Theme Color -->
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F8FC">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F8FC">
 
-<!-- Dark Mode Theme Color -->
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090A10">
+  <!-- Dark Mode Theme Color -->
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090A10">
 
-<!-- iPhone Strict Native Status Bar -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  </head>
+  <!-- iPhone Strict Native Status Bar -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
 <body class="bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 min-h-screen selection:bg-brand-500 selection:text-white antialiased">
-
-  <!-- ==================== 1. PRODUCT SHOWCASE VIEW (LANDING PAGE) ==================== -->
-  <div id="landingShowcaseSection" class="min-h-screen pb-20 bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 transition-colors duration-300">
-    <header class="sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-[#090A10]/85 border-b border-slate-200 dark:border-white/10 px-6 py-4">
+<!-- ==================== 1. PRODUCT SHOWCASE VIEW (LANDING PAGE) ==================== -->
+  <div id="landingShowcaseSection" class="min-h-screen pb-4 bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 transition-colors duration-300">
+    
+    <!-- Fix 2 Applied: Header Notch Overlap fixed with proper padding-top -->
+    <header class="pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-4 sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-[#090A10]/85 border-b border-slate-200 dark:border-white/10 px-6">
       <div class="max-w-6xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-black shadow-lg shadow-purple-600/30">ET</div>
@@ -450,6 +457,7 @@ body {
         </div>
       </div>
     </div>
+    
     <!-- ==================== BIG CTA BANNER ==================== -->
     <section class="max-w-5xl mx-auto px-6 py-12">
       <div class="rounded-3xl p-8 md:p-12 bg-gradient-to-tr from-purple-900/60 via-indigo-900/50 to-slate-900/80 border border-purple-500/30 backdrop-blur-2xl text-center relative overflow-hidden shadow-2xl">
@@ -464,7 +472,6 @@ body {
         </div>
       </div>
     </section>
-
     <!-- ==================== PROFESSIONAL FOOTER ==================== -->
     <footer class="max-w-6xl mx-auto px-6 pt-12 pb-8 border-t border-slate-200/50 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
       <div>
@@ -473,7 +480,6 @@ body {
       </div>
       <p class="text-[11px] text-slate-500">© 2026 All Rights Reserved • Built with Tailwind CSS & PWA Standards</p>
     </footer>
-
   </div>
 
   <!-- ==================== 2. MAIN ACTIVE APP WORKSPACE ==================== -->
@@ -546,12 +552,14 @@ body {
         </div>
       </div>
     </aside>
+
     <div class="flex-1 flex flex-col min-w-0">
-      <!-- MCB TOP HERO HEADER -->
-      <div id="mcbHeaderContainer" class="md:hidden mcb-curved-banner rounded-b-[40px] pt-4 pb-7 px-4 shadow-2xl relative overflow-hidden transition-all duration-300">
+      
+      <!-- MCB TOP HERO HEADER (Fix 2: Removed Duplicate Headers & Added Safe Area Padding) -->
+      <div id="mcbHeaderContainer" class="md:hidden mcb-curved-banner rounded-b-[40px] pt-[calc(1.5rem+env(safe-area-inset-top,0px))] pb-7 px-4 shadow-2xl relative overflow-hidden transition-all duration-300 z-10">
         
         <!-- TOP ROW: Lang, Dynamic User Name, Theme -->
-        <div class="flex items-center justify-between mb-4 relative">
+        <div class="flex items-center justify-between mb-4 relative z-20">
           <button onclick="cycleLanguage()" class="mcb-action-btn px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1 shadow-sm shrink-0" id="langSwitchBtn">
             <span id="langMainLabel">English</span>
           </button>
@@ -567,7 +575,7 @@ body {
         </div>
 
         <!-- 3D FLIP BALANCE CARD -->
-        <div class="flip-card-container">
+        <div class="flip-card-container relative z-20">
           <div id="mcbFlipCard" class="flip-card-inner">
 
             <!-- FRONT SIDE: Balance Card -->
@@ -650,9 +658,8 @@ body {
           </div>
         </div>
       </div>
-
-      <!-- Main Canvas Area -->
-      <main id="mainCanvasArea" class="flex-1 p-4 md:p-8 pb-32 md:pb-8 max-w-5xl w-full mx-auto overflow-y-auto no-scrollbar">
+<!-- Main Canvas Area -->
+      <main id="mainCanvasArea" class="flex-1 p-4 md:p-8 pb-32 md:pb-8 max-w-5xl w-full mx-auto overflow-y-auto no-scrollbar pt-[calc(1rem+env(safe-area-inset-top,0px))] md:pt-8">
 
         <!-- VIEW 1: DASHBOARD -->
         <div id="viewDashboard" class="space-y-5">
@@ -993,7 +1000,8 @@ body {
       </nav>
     </div>
   </div>
-  <!-- MODAL: ADD RECORD (ALL 8 CATEGORIES GRID + SMART OCR RECEIPT SCANNER) -->
+<!-- MODAL: ADD RECORD (ALL 8 CATEGORIES GRID + SMART OCR RECEIPT SCANNER) -->
+  <!-- Fix 4 Applied: Modal background changed from solid white to transparent dark (bg-black/75) -->
   <div id="addModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-end md:items-center justify-center md:p-4">
     <div class="w-full max-w-md bg-white dark:bg-[#11131f] rounded-t-[32px] md:rounded-3xl p-6 border-t md:border border-slate-200/80 dark:border-white/10 max-h-[92vh] overflow-y-auto no-scrollbar shadow-2xl">
       <div class="flex justify-between items-center mb-4">
@@ -1223,8 +1231,9 @@ body {
   </div>
 
   <!-- DRAWER: KHARCHABOOKS (WITH DELETE BUTTON FOR CUSTOM BOOKS) -->
+  <!-- Fix 1 Applied: Added 'fixed left-0' so the drawer is correctly attached to the left edge -->
   <div id="booksDrawer" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex justify-start">
-    <div class="w-4/5 max-w-xs mcb-drawer-gradient h-full p-5 flex flex-col justify-between text-white">
+    <div class="fixed left-0 top-0 w-4/5 max-w-xs mcb-drawer-gradient h-[100dvh] max-h-[100dvh] overflow-y-auto p-5 flex flex-col justify-between text-white shadow-2xl">
       <div>
         <div class="flex justify-between items-center pb-4 border-b border-white/10">
           <div class="flex items-center gap-2">
@@ -1271,7 +1280,7 @@ body {
       </div>
     </div>
   </div>
-  <!-- ==================== 3. JAVASCRIPT ENGINE ==================== -->
+<!-- ==================== 3. JAVASCRIPT ENGINE ==================== -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -1577,7 +1586,7 @@ body {
 
       const headerBox = document.getElementById('mcbHeaderContainer');
       if (headerBox) {
-        if (tabId === 'calendar' || tabId === 'settings') {
+        if (tabId === 'calendar' || tabId === 'settings' || tabId === 'transactions') {
           headerBox.classList.add('hidden');
         } else {
           headerBox.classList.remove('hidden');
@@ -1610,7 +1619,7 @@ body {
       if (window.lucide) lucide.createIcons();
     }
 
-    function clearReceiptPhoto() {
+   function clearReceiptPhoto() {
       attachedReceiptBase64 = null;
       const fileInput = document.getElementById('receiptFileInput');
       if (fileInput) fileInput.value = '';
@@ -1625,73 +1634,119 @@ body {
       if (statusTxt) statusTxt.textContent = settings.language === 'ur' ? "بل اسکین کریں" : "Scan Bill / Auto-Fill Items";
     }
 
-    // ADVANCED MULTI-ITEM OCR SCANNER WITH STORE NAME DETECTION & BILINGUAL NOTIFICATIONS
+    // ==========================================
+    // PREMIUM AI MODULE (FREEMIUM MODEL)
+    // ==========================================
+
+    const DAILY_FREE_AI_LIMIT = 3; // Din mein 3 dafa auto-add free hai
+
+    function getAILimitStatus() {
+      const today = new Date().toISOString().split('T')[0];
+      let usage = JSON.parse(localStorage.getItem('ET_AI_USAGE')) || { date: today, count: 0 };
+      if (usage.date !== today) {
+        usage = { date: today, count: 0 }; // Naye din ke liye reset
+      }
+      return usage;
+    }
+
+    function consumeAILimit() {
+      let usage = getAILimitStatus();
+      usage.count++;
+      localStorage.setItem('ET_AI_USAGE', JSON.stringify(usage));
+    }
+
+    function isAILimitExceeded() {
+      let usage = getAILimitStatus();
+      return usage.count >= DAILY_FREE_AI_LIMIT;
+    }
+
+    function speakAI(text, callback) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = settings.language === 'ur' ? 'ur-PK' : 'hi-IN';
+        utterance.rate = 1.0;
+        utterance.onend = () => { if (callback) callback(); };
+        window.speechSynthesis.speak(utterance);
+      } else {
+        if (callback) callback();
+      }
+    }
+
     async function handleSmartReceiptScan(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
 
-      const isUrdu = settings.language === 'ur';
+      if (isAILimitExceeded()) {
+        const limitMsg = "Apki limit khatam hogai hai, aap paid subscription le kar bill scan kar ke unlimited expense generate krwa sakte hain.";
+        showToast("⚠️ Subscription Required");
+        speakAI(limitMsg);
+        e.target.value = ''; // Reset
+        return;
+      }
+
       const statusTxt = document.getElementById('ocrStatusText');
-      if (statusTxt) statusTxt.textContent = isUrdu ? "آپ کا بل اسکین ہو رہا ہے... ⏳" : "Scanning your bill... ⏳";
-      showToast(isUrdu ? "بل شامل کیا جا رہا ہے... ⏳" : "Scanning and adding your bill... ⏳");
+      if (statusTxt) statusTxt.textContent = "✨ AI Scanning Bill...";
+      showToast("Uploading and scanning bill with AI...");
 
       const reader = new FileReader();
       reader.onload = async function(evt) {
         attachedReceiptBase64 = evt.target.result;
         const prev = document.getElementById('receiptPreviewImg');
         const cBtn = document.getElementById('btnClearReceipt');
-        if (prev) {
-          prev.src = attachedReceiptBase64;
-          prev.classList.remove('hidden');
-        }
+        if (prev) { prev.src = attachedReceiptBase64; prev.classList.remove('hidden'); }
         if (cBtn) cBtn.classList.remove('hidden');
 
+        consumeAILimit(); // Limit minus ho gayi
+
         try {
-      if (statusTxt) statusTxt.textContent = isUrdu ? "✨ AI اسکین کر رہا ہے..." : "✨ AI Scanning...";
-      showToast(isUrdu ? "AI بل اسکین کر رہا ہے..." : "Gemini AI reading receipt...");
+          const rawBase64 = attachedReceiptBase64.split(',')[1];
+          const mimeType = attachedReceiptBase64.split(';')[0].split(':')[1] || 'image/jpeg';
 
-      const rawBase64 = attachedReceiptBase64.split(',')[1];
-      const mimeType = attachedReceiptBase64.split(';')[0].split(':')[1] || 'image/jpeg';
+          const prompt = `Read this receipt carefully. 
+          Return ONLY valid JSON matching this structure:
+          {"storeName": "Name of shop", "totalAmount": 0, "category": "Food"}
+          Categories allowed: Food/Drink, Fuel, Bills, Transport, Shopping, Groceries, Health, Other.
+          Pure JSON only.`;
 
-      const prompt = `Analyze this receipt image. Extract store name, total final bill amount, and category.
-Return ONLY valid JSON matching this exact structure:
-{"storeName": "Name of shop or main item", "totalAmount": 0, "category": "Food"}
-Categories allowed: Food, Fuel, Bills, Transport, Shopping, Other.
-Do not wrap with markdown or code blocks. Pure JSON only.`;
+          const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: prompt },
+                  { inline_data: { mime_type: mimeType, data: rawBase64 } }
+                ]
+              }]
+            })
+          });
 
-      const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: prompt },
-              { inline_data: { mime_type: mimeType, data: rawBase64 } }
-            ]
-          }]
-        })
-      });
+          const aiData = await aiResponse.json();
+          const rawText = aiData.candidates[0].content.parts[0].text;
+          const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
 
-      const aiData = await aiResponse.json();
-      const rawText = aiData.candidates[0].content.parts[0].text;
-      const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
+          const amtEl = document.getElementById('modalAmountInput');
+          const ttlEl = document.getElementById('modalTitleInput');
 
-      const amtEl = document.getElementById('modalAmountInput');
-      const ttlEl = document.getElementById('modalTitleInput');
+          if (amtEl && parsed.totalAmount) amtEl.value = parsed.totalAmount;
+          if (ttlEl && parsed.storeName) ttlEl.value = parsed.storeName;
+          
+          if (parsed.category) {
+             selectCategory(parsed.category, '✨');
+          }
 
-      if (amtEl && parsed.totalAmount) amtEl.value = parsed.totalAmount;
-      if (ttlEl && parsed.storeName) ttlEl.value = parsed.storeName;
-
-      if (statusTxt) statusTxt.textContent = isUrdu ? "مکمل ہو گیا!" : "Scan Complete!";
-      showToast(isUrdu ? "بل کامیابی سے درج ہو گیا!" : `Scanned: ${parsed.storeName || 'Bill'} - Rs ${parsed.totalAmount || 0}`);
-    } catch (err) {
-      console.error("AI Scan Error:", err);
-      if (statusTxt) statusTxt.textContent = isUrdu ? "دستی درج کریں" : "Manual Entry";
-      showToast(isUrdu ? "اسکین میں مسئلہ آیا، خود درج کریں۔" : "Could not scan cleanly, please enter manually.");
-    }
+          if (statusTxt) statusTxt.textContent = "Scan Complete!";
+          showToast(`Scanned: ${parsed.storeName || 'Bill'} - Rs ${parsed.totalAmount || 0}`);
+          speakAI(`Bill scan ho gaya hai. Amount hai ${parsed.totalAmount} rupe.`);
+        } catch (err) {
+          console.error("AI Scan Error:", err);
+          if (statusTxt) statusTxt.textContent = "Manual Entry";
+          showToast("Could not scan cleanly, please enter manually.");
+        }
       };
       reader.readAsDataURL(file);
     }
+
     function openAddModal() {
       const amt = document.getElementById('modalAmountInput');
       const ttl = document.getElementById('modalTitleInput');
@@ -1711,91 +1766,120 @@ Do not wrap with markdown or code blocks. Pure JSON only.`;
       }
       if (window.lucide) lucide.createIcons();
     }
- // --- GEMINI AI VOICE TO TRANSACTION ---
-function startVoiceExpense() {
-  const voiceBtn = document.getElementById('voiceBtnText');
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  if (!SpeechRecognition) {
-    if (typeof showToast === 'function') {
-      showToast("Voice input is not supported in this browser. Use Chrome or Edge.");
-    } else {
-      alert("Voice input is not supported in this browser. Use Chrome or Edge.");
-    }
-    return;
-  }
+    function startVoiceExpense() {
+      const voiceBtn = document.getElementById('voiceBtnText');
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  try {
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'ur-PK';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+      if (!SpeechRecognition) {
+        alert("Voice API is not supported in this browser.");
+        return;
+      }
 
-    if (voiceBtn) voiceBtn.textContent = "Listening... Speak now";
-    if (typeof showToast === 'function') showToast("Listening... Speak your expense (e.g. 500 petrol)");
+      if (voiceBtn) voiceBtn.textContent = "AI is speaking...";
+      
+      speakAI("Jee, main aapki expense tracker app main kya madad kar sakti hu?", () => {
+        try {
+          const recognition = new SpeechRecognition();
+          recognition.lang = settings.language === 'ur' ? 'ur-PK' : 'hi-IN';
+          recognition.interimResults = false;
+          recognition.maxAlternatives = 1;
 
-    recognition.onstart = () => {
-      console.log("Mic recording started");
-    };
+          if (voiceBtn) voiceBtn.textContent = "Listening... Speak now";
+          
+          recognition.onresult = async (event) => {
+            const spokenText = event.results[0][0].transcript;
+            if (voiceBtn) voiceBtn.textContent = "AI is thinking...";
 
-    recognition.onresult = async (event) => {
-      const spokenText = event.results[0][0].transcript;
-      if (voiceBtn) voiceBtn.textContent = "Processing with AI...";
-      if (typeof showToast === 'function') showToast(`Heard: "${spokenText}"`);
+            const lowerText = spokenText.toLowerCase();
 
-      const prompt = `Extract expense details from this input: "${spokenText}".
-Return ONLY pure JSON matching this schema:
-{"storeName": "Brief item or merchant name", "totalAmount": 0, "category": "Food"}
-Categories allowed: Food, Groceries, Fuel, Transport, Bills, Shopping, Health, Other.
-Do NOT use markdown or backticks. Return raw JSON only.`;
+            // --- FREE LOCAL COMMANDS (NO API KEY, NO LIMIT CUT) ---
+            if (lowerText.includes("کس نے") || lowerText.includes("بنایا") || lowerText.includes("کریئٹر")) {
+              speakAI("Mujhe zee ne program kiya hai. Aap ko bhi aisi apps banwani hain toh unse zero three one four, five two three, zero nine nine nine par rabta karein.");
+              if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+            }
+            else if (lowerText.includes("ہیلو") || lowerText.includes("ہائے") || lowerText.includes("ہلو")) {
+              speakAI("Hello, welcome to expense tracker.");
+              if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+            }
+            else if (lowerText.includes("کیسے ہو") || lowerText.includes("کیا حال")) {
+              speakAI("Main bilkul theek hoon, shukriya!");
+              if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+            }
 
-      try {
-        const key = (typeof GEMINI_API_KEY !== 'undefined') ? GEMINI_API_KEY : localStorage.getItem('USER_GEMINI_KEY');
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
+            // --- EXPENSE ADDITION (USES API KEY & CUTS DAILY LIMIT) ---
+            else {
+              if (isAILimitExceeded()) {
+                // Shortened limit message as requested
+                speakAI("apki free limit khatam hogai hai.");
+                if (voiceBtn) voiceBtn.textContent = "Add with Voice";
+                return;
+              }
 
-        const data = await res.json();
-        const rawText = data.candidates[0].content.parts[0].text;
-        const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
+              consumeAILimit(); // Yahan limit minus ho jayegi
 
-        const amtEl = document.getElementById('modalAmountInput');
-        const ttlEl = document.getElementById('modalTitleInput');
+              const prompt = `Extract expense/income details from this sentence: "${spokenText}".
+              Return ONLY pure JSON matching this exact schema:
+              {"amount": number, "category": "CategoryName", "note": "Specific detail", "type": "expense"}
+              Categories allowed: Food/Drink, Groceries, Fuel, Transport, Bills, Shopping, Health, Other.
+              If it's 'income' or 'received', set type to 'income'.
+              Do NOT wrap in markdown or backticks. Valid JSON only.`;
 
-        if (amtEl && parsed.totalAmount) amtEl.value = parsed.totalAmount;
-        if (ttlEl && parsed.storeName) ttlEl.value = parsed.storeName;
+              try {
+                // Vercel / Local Key Handling
+                const key = (typeof GEMINI_API_KEY !== 'undefined') ? GEMINI_API_KEY : localStorage.getItem('USER_GEMINI_KEY');
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
 
-        if (typeof showToast === 'function') {
-          showToast(`Added: ${parsed.storeName} - Rs. ${parsed.totalAmount}`);
+                const data = await res.json();
+                const rawText = data.candidates[0].content.parts[0].text;
+                const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
+
+                const currentBook = getActiveBook();
+                const now = new Date();
+                const newTx = {
+                  id: Date.now(),
+                  title: parsed.note || parsed.category,
+                  amount: parsed.amount || 0,
+                  type: parsed.type || 'expense',
+                  category: parsed.category || 'Other',
+                  icon: parsed.type === 'income' ? '💰' : '✨',
+                  receipt: null,
+                  date: now.toLocaleDateString('en-PK', { month: 'short', day: 'numeric', year: 'numeric' }),
+                  rawDate: now.toISOString().split('T')[0],
+                  time: now.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' })
+                };
+
+                currentBook.transactions.unshift(newTx);
+                persist();
+                closeAddModal();
+
+                speakAI(`Aapke ${parsed.amount} rupe ${parsed.type === 'expense' ? 'expense' : 'income'} main add kar diye gaye hain.`);
+
+              } catch (err) {
+                console.error("Gemini Error:", err);
+                speakAI("AI ko samajh nahi aaya. Please try again.");
+              } finally {
+                if (voiceBtn) voiceBtn.textContent = "Add with Voice";
+              }
+            }
+          };
+
+          recognition.onerror = (event) => {
+            if (voiceBtn) voiceBtn.textContent = "Add with Voice";
+          };
+
+          recognition.start();
+        } catch (e) {
+          console.error("Mic start error:", e);
+          if (voiceBtn) voiceBtn.textContent = "Add with Voice";
         }
-      } catch (err) {
-        console.error("Gemini Error:", err);
-        if (typeof showToast === 'function') showToast("AI could not extract details. Enter manually.");
-      } finally {
-        if (voiceBtn) voiceBtn.textContent = "Add with Voice";
-      }
-    };
+      });
+    }
 
-    recognition.onerror = (event) => {
-      console.error("Speech Error:", event.error);
-      if (voiceBtn) voiceBtn.textContent = "Add with Voice";
-      alert("Mic permission error: " + event.error + ". Browser settings mein Microphone allow karein.");
-    };
-
-    recognition.onend = () => {
-      if (voiceBtn && voiceBtn.textContent === "Listening... Speak now") {
-        voiceBtn.textContent = "Add with Voice";
-      }
-    };
-
-    recognition.start();
-  } catch (e) {
-    console.error("Recognition start error:", e);
-    if (voiceBtn) voiceBtn.textContent = "Add with Voice";
-  }
-}
     function closeAddModal() { 
       const m = document.getElementById('addModal'); 
       if (m) {
@@ -2742,7 +2826,7 @@ Do NOT use markdown or backticks. Return raw JSON only.`;
         if (iconM) iconM.setAttribute('data-lucide', 'moon');
         if (iconD) iconD.setAttribute('data-lucide', 'moon');
         if (iconLanding) iconLanding.setAttribute('data-lucide', 'moon');
-        if (meta) meta.setAttribute('content', '#ffffff');
+        if (meta) meta.setAttribute('content', '#F6F8FC');
       }
       if (window.lucide) lucide.createIcons();
       if (typeof renderChart === 'function') renderChart();
@@ -2760,7 +2844,7 @@ Do NOT use markdown or backticks. Return raw JSON only.`;
   // Dynamic status bar meta color update for light and dark modes
   const meta = document.getElementById('themeMeta');
   if (meta) {
-    meta.setAttribute('content', isDark ? '#1e1b4b' : '#ffffff');
+    meta.setAttribute('content', isDark ? '#1e1b4b' : '#F6F8FC');
   }
 
   applyTheme(newTheme);
@@ -3070,15 +3154,31 @@ Do NOT use markdown or backticks. Return raw JSON only.`;
       updateTopBarUserName();
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      initTheme();
-      applyLanguage();
-      renderProfileDp();
-      verifyAppModePersistence();
-      renderAuthUI();
-      updateTopBarUserName();
-      if (window.lucide) lucide.createIcons();
+   window.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        applyLanguage();
+        renderProfileDp();
+        verifyAppModePersistence();
+        renderAuthUI();
+        updateTopBarUserName();
+        if (window.lucide) lucide.createIcons();
     });
+
+    async function shareApp() {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Tracking Expenses by Zeeshan Ali Khan',
+                    text: 'Expense Tracker created by zee',
+                    url: window.location.href
+                });
+            } catch (err) {
+                console.log('Share cancelled');
+            }
+        } else {
+            alert('Share feature is mobile par support nahi kar raha.');
+        }
+    }
   </script>
 </body>
 </html>
