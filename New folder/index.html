@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#9333ea" />
+  
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   
@@ -162,11 +162,12 @@
       -webkit-transform: rotateY(180deg) translate3d(0, 0, 1px) !important;
     }
 
-    .mcb-drawer-gradient {
-      background: linear-gradient(180deg, #1e1b4b 0%, #151128 50%, #090a10 100%) !important;
-      border-right: 1px solid rgba(168, 85, 247, 0.25) !important;
-      box-shadow: 15px 0 40px rgba(0, 0, 0, 0.75);
-    }
+   .mcb-drawer-gradient {
+  background: linear-gradient(180deg, #1e1b4b 0%, #151128 50%, #090a10 100%) !important;
+  border-right: 1px solid rgba(168, 85, 247, 0.25) !important;
+  box-shadow: 15px 0 40px rgba(0, 0, 0, 0.75);
+  padding-top: max(3.5rem, env(safe-area-inset-top, 30px)) !important; /* Notch ke neeche laane ke liye */
+}
 
     .magnetic-btn { transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -178,18 +179,18 @@
   </style>
   
   <!-- Light Mode Theme Color -->
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F8FC">
-
+  <meta name="theme-color" content="#1e1b4b" id="themeMeta">
+<meta name="theme-color" content="#1e1b4b">
   <!-- Dark Mode Theme Color -->
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090A10">
+  <meta name="theme-color" content="#1e1b4b" id="themeMeta">
 
   <!-- iPhone Strict Native Status Bar -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="Black-translucent">
 </head>
 <body class="bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 min-h-screen selection:bg-brand-500 selection:text-white antialiased">
 <!-- ==================== 1. PRODUCT SHOWCASE VIEW (LANDING PAGE) ==================== -->
-  <div id="landingShowcaseSection" class="min-h-screen pb-4 bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 transition-colors duration-300">
+  <div id="landingShowcaseSection" class="min-h-screen pb-20 bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 transition-colors duration-300">
     
     <!-- Fix 2 Applied: Header Notch Overlap fixed with proper padding-top -->
     <header class="pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-4 sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-[#090A10]/85 border-b border-slate-200 dark:border-white/10 px-6">
@@ -472,6 +473,7 @@
         </div>
       </div>
     </section>
+
     <!-- ==================== PROFESSIONAL FOOTER ==================== -->
     <footer class="max-w-6xl mx-auto px-6 pt-12 pb-8 border-t border-slate-200/50 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
       <div>
@@ -480,9 +482,9 @@
       </div>
       <p class="text-[11px] text-slate-500">© 2026 All Rights Reserved • Built with Tailwind CSS & PWA Standards</p>
     </footer>
-  </div>
 
-  <!-- ==================== 2. MAIN ACTIVE APP WORKSPACE ==================== -->
+  </div>
+<!-- ==================== 2. MAIN ACTIVE APP WORKSPACE ==================== -->
   <div id="mainAppSection" style="display: none;" class="min-h-screen bg-[#F6F8FC] dark:bg-[#08090d] text-slate-800 dark:text-slate-100 flex-col md:flex-row">
     <div id="customToastBox" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-[100] max-w-sm w-[90%] bg-white dark:bg-[#1E2132] border border-slate-200/80 dark:border-white/10 p-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all">
       <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
@@ -1230,17 +1232,16 @@
     </div>
   </div>
 
-  <!-- DRAWER: KHARCHABOOKS (WITH DELETE BUTTON FOR CUSTOM BOOKS) -->
-  <!-- Fix 1 Applied: Added 'fixed left-0' so the drawer is correctly attached to the left edge -->
-  <div id="booksDrawer" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex justify-start">
-    <div class="fixed left-0 top-0 w-4/5 max-w-xs mcb-drawer-gradient h-[100dvh] max-h-[100dvh] overflow-y-auto p-5 flex flex-col justify-between text-white shadow-2xl">
+  <!-- DRAWER: KHARCHABOOKS (WITH SAFE AREA & BACKDROP CLICK TO CLOSE) -->
+  <div id="booksDrawer" onclick="closeBooksDrawer()" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex justify-start">
+    <div onclick="event.stopPropagation()" class="fixed left-0 top-0 w-4/5 max-w-xs mcb-drawer-gradient h-[100dvh] max-h-[100dvh] overflow-y-auto p-5 flex flex-col justify-between text-white shadow-2xl">
       <div>
         <div class="flex justify-between items-center pb-4 border-b border-white/10">
           <div class="flex items-center gap-2">
             <div class="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs font-black shadow-md">ET</div>
             <h3 id="drawerHeaderTitle" class="text-xs font-extrabold tracking-wider uppercase text-purple-200">KharchaBooks Folder</h3>
           </div>
-          <button onclick="closeBooksDrawer()" class="text-xs text-slate-400 hover:text-white p-1">✕</button>
+          <button onclick="closeBooksDrawer()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs text-white hover:bg-white/20 active:scale-90 transition">✕</button>
         </div>
         <div id="booksListContainer" class="mt-4 space-y-2"></div>
         <div class="mt-4 pt-3 border-t border-white/10">
@@ -1406,7 +1407,6 @@
 
     const SUPABASE_PROJECT_URL = 'https://hzcvjikuevxmiyrgdiec.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_4FcXzpJ4sMPhO4yN7HtFHA_m0t7_tCI';
-    const GEMINI_API_KEY = 'AQ.Ab8RN6J1oC3y00nWzsBkJVuqeAt6o7L9jIRIGCzWPdzJ3aYNWA';
     let supabaseClient = null;
     try {
       if (window.supabase) supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
@@ -1772,111 +1772,123 @@
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
       if (!SpeechRecognition) {
-        alert("Voice API is not supported in this browser.");
+        showToast("Voice API is not supported in this browser.");
         return;
       }
 
       if (voiceBtn) voiceBtn.textContent = "AI is speaking...";
-      
-      speakAI("Jee, main aapki expense tracker app main kya madad kar sakti hu?", () => {
-        try {
-          const recognition = new SpeechRecognition();
-          recognition.lang = settings.language === 'ur' ? 'ur-PK' : 'hi-IN';
-          recognition.interimResults = false;
-          recognition.maxAlternatives = 1;
+      speakAI("Yes how may i help you?", () => {
+        
+        const recognition = new SpeechRecognition();
+        recognition.lang = settings.language === 'ur' ? 'ur-PK' : 'hi-IN';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
 
-          if (voiceBtn) voiceBtn.textContent = "Listening... Speak now";
-          
-          recognition.onresult = async (event) => {
-            const spokenText = event.results[0][0].transcript;
-            if (voiceBtn) voiceBtn.textContent = "AI is thinking...";
+        if (voiceBtn) voiceBtn.textContent = "Listening... Speak now";
+        showToast("Listening...");
 
-            const lowerText = spokenText.toLowerCase();
+        recognition.onresult = async (event) => {
+          const spokenText = event.results[0][0].transcript;
+          if (voiceBtn) voiceBtn.textContent = "AI is thinking...";
+          showToast(`Heard: "${spokenText}"`);
 
-            // --- FREE LOCAL COMMANDS (NO API KEY, NO LIMIT CUT) ---
-            if (lowerText.includes("کس نے") || lowerText.includes("بنایا") || lowerText.includes("کریئٹر")) {
-              speakAI("Mujhe zee ne program kiya hai. Aap ko bhi aisi apps banwani hain toh unse zero three one four, five two three, zero nine nine nine par rabta karein.");
-              if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+          const lowerText = spokenText.toLowerCase();
+
+          // --- FREE LOCAL COMMANDS (IN PAR LIMIT NAHI KATEGI) ---
+          if (lowerText.includes("kis ne banaya") || lowerText.includes("creator") || lowerText.includes("kisne banaya")) {
+            const replyMsg = "Zeeshan create this app and program me you can contact him at zero three one four, five two three, zero nine nine nine.";
+            showToast("Creator: Zee Digital"); speakAI(replyMsg);
+            if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+          }
+          else if (lowerText.includes("hello") || lowerText === "hi") {
+            const replyMsg = "Hello, welcome to expense tracker.";
+            showToast(replyMsg); speakAI(replyMsg);
+            if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+          }
+          else if (lowerText.includes("assalam") || lowerText.includes("salam")) {
+            const replyMsg = "Walikum salam.";
+            showToast(replyMsg); speakAI(replyMsg);
+            if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+          }
+          else if (lowerText.includes("kaise ho") || lowerText.includes("kya haal")) {
+            const replyMsg = "Main bilkul theek hoon, shukriya!";
+            showToast(replyMsg); speakAI(replyMsg);
+            if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+          }
+          else if (lowerText.includes("naam kya hai") || lowerText.includes("name")) {
+            const replyMsg = "Mera naam Expense Tracker AI hai.";
+            showToast(replyMsg); speakAI(replyMsg);
+            if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+          }
+
+          // --- EXPENSE ADDITION (API CALL - USES DAILY LIMIT) ---
+          else {
+            if (isAILimitExceeded()) {
+              const limitMsg = "Apki limit khatam hogai hai, aap paid subscription le kar bol kar unlimited expense generate krwa sakte hain.";
+              showToast("⚠️ Subscription Required");
+              speakAI(limitMsg);
+              if (voiceBtn) voiceBtn.textContent = "Add with Voice";
+              return;
             }
-            else if (lowerText.includes("ہیلو") || lowerText.includes("ہائے") || lowerText.includes("ہلو")) {
-              speakAI("Hello, welcome to expense tracker.");
-              if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
+
+            consumeAILimit(); // Limit me se 1 minus ho gaya
+
+            const prompt = `Extract expense/income details from this sentence: "${spokenText}".
+            Return ONLY pure JSON matching this exact schema:
+            {"amount": number, "category": "CategoryName", "note": "Specific detail", "type": "expense"}
+            Categories allowed: Food/Drink, Groceries, Fuel, Transport, Bills, Shopping, Health, Other.
+            If it's 'income' or 'received', set type to 'income'.
+            Do NOT wrap in markdown or backticks. Valid JSON only.`;
+
+            try {
+              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+              });
+
+              const data = await res.json();
+              const rawText = data.candidates[0].content.parts[0].text;
+              const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
+
+              const currentBook = getActiveBook();
+              const now = new Date();
+              const newTx = {
+                id: Date.now(),
+                title: parsed.note || parsed.category,
+                amount: parsed.amount || 0,
+                type: parsed.type || 'expense',
+                category: parsed.category || 'Other',
+                icon: parsed.type === 'income' ? '💰' : '✨',
+                receipt: null,
+                date: now.toLocaleDateString('en-PK', { month: 'short', day: 'numeric', year: 'numeric' }),
+                rawDate: now.toISOString().split('T')[0],
+                time: now.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' })
+              };
+
+              currentBook.transactions.unshift(newTx);
+              persist();
+              closeAddModal();
+
+              const confirmMsg = `Aapke ${parsed.amount} rupe ${parsed.type === 'expense' ? 'expense' : 'income'} main add kar diye gaye hain.`;
+              showToast(confirmMsg);
+              speakAI(confirmMsg);
+
+            } catch (err) {
+              console.error("Gemini Error:", err);
+              showToast("AI ko samajh nahi aaya. Please try again.");
+            } finally {
+              if (voiceBtn) voiceBtn.textContent = "Add with Voice";
             }
-            else if (lowerText.includes("کیسے ہو") || lowerText.includes("کیا حال")) {
-              speakAI("Main bilkul theek hoon, shukriya!");
-              if (voiceBtn) voiceBtn.textContent = "Add with Voice"; return;
-            }
+          }
+        };
 
-            // --- EXPENSE ADDITION (USES API KEY & CUTS DAILY LIMIT) ---
-            else {
-              if (isAILimitExceeded()) {
-                // Shortened limit message as requested
-                speakAI("apki free limit khatam hogai hai.");
-                if (voiceBtn) voiceBtn.textContent = "Add with Voice";
-                return;
-              }
-
-              consumeAILimit(); // Yahan limit minus ho jayegi
-
-              const prompt = `Extract expense/income details from this sentence: "${spokenText}".
-              Return ONLY pure JSON matching this exact schema:
-              {"amount": number, "category": "CategoryName", "note": "Specific detail", "type": "expense"}
-              Categories allowed: Food/Drink, Groceries, Fuel, Transport, Bills, Shopping, Health, Other.
-              If it's 'income' or 'received', set type to 'income'.
-              Do NOT wrap in markdown or backticks. Valid JSON only.`;
-
-              try {
-                // Vercel / Local Key Handling
-                const key = (typeof GEMINI_API_KEY !== 'undefined') ? GEMINI_API_KEY : localStorage.getItem('USER_GEMINI_KEY');
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-
-                const data = await res.json();
-                const rawText = data.candidates[0].content.parts[0].text;
-                const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
-
-                const currentBook = getActiveBook();
-                const now = new Date();
-                const newTx = {
-                  id: Date.now(),
-                  title: parsed.note || parsed.category,
-                  amount: parsed.amount || 0,
-                  type: parsed.type || 'expense',
-                  category: parsed.category || 'Other',
-                  icon: parsed.type === 'income' ? '💰' : '✨',
-                  receipt: null,
-                  date: now.toLocaleDateString('en-PK', { month: 'short', day: 'numeric', year: 'numeric' }),
-                  rawDate: now.toISOString().split('T')[0],
-                  time: now.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' })
-                };
-
-                currentBook.transactions.unshift(newTx);
-                persist();
-                closeAddModal();
-
-                speakAI(`Aapke ${parsed.amount} rupe ${parsed.type === 'expense' ? 'expense' : 'income'} main add kar diye gaye hain.`);
-
-              } catch (err) {
-                console.error("Gemini Error:", err);
-                speakAI("AI ko samajh nahi aaya. Please try again.");
-              } finally {
-                if (voiceBtn) voiceBtn.textContent = "Add with Voice";
-              }
-            }
-          };
-
-          recognition.onerror = (event) => {
-            if (voiceBtn) voiceBtn.textContent = "Add with Voice";
-          };
-
-          recognition.start();
-        } catch (e) {
-          console.error("Mic start error:", e);
+        recognition.onerror = (event) => {
           if (voiceBtn) voiceBtn.textContent = "Add with Voice";
-        }
+          showToast("Mic error: " + event.error);
+        };
+
+        recognition.start();
       });
     }
 
@@ -2844,7 +2856,7 @@
   // Dynamic status bar meta color update for light and dark modes
   const meta = document.getElementById('themeMeta');
   if (meta) {
-    meta.setAttribute('content', isDark ? '#1e1b4b' : '#F6F8FC');
+    meta.setAttribute('content', isDark ? '#1e1b4b' : '#1e1b4b');
   }
 
   applyTheme(newTheme);

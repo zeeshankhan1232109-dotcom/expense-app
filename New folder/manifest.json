@@ -3,7 +3,7 @@
   "short_name": "Expenses",
   "start_url": "./?source=pwa",
   "display": "standalone",
-  "background_color": "#090A10",
+  "background_color": "#1e1b4b",
   "theme_color": "#1e1b4b",
   "orientation": "portrait",
   "icons": [
